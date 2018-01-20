@@ -81,14 +81,16 @@ final class Annotations
      * @return array  self::$_annotations all annotated elements
      * @throws \ReflectionException
      */
-    public function getClassAnnotations($className): array
+    public function getClassAnnotations(string $className): array
     {
-        if (!isset(self::$_annotations[$className])) {
+        $key = $className . '.class';
+
+        if (!isset(self::$_annotations[$key])) {
             $class = new \ReflectionClass($className);
-            self::$_annotations[$className] = self::parseAnnotations($class->getDocComment());
+            self::$_annotations[$key] = self::parseAnnotations($class->getDocComment());
         }
 
-        return self::$_annotations[$className];
+        return self::$_annotations[$key];
     }
 
     /**
@@ -98,20 +100,83 @@ final class Annotations
      * @param  string $methodName method name to get annotations
      * @return array[]  self::$_annotations all annotated elements of a method given
      */
-    public function getMethodAnnotations($className, $methodName): array
+    public function getMethodAnnotations(string $className, string $methodName = null): array
     {
-        if (!isset(self::$_annotations[$className . '::' . $methodName])) {
+        $prefix = $className . '.methods';
+
+        if (!isset(self::$_annotations[$prefix][$methodName])) {
             try {
                 $method = new \ReflectionMethod($className, $methodName);
                 $annotations = self::parseAnnotations($method->getDocComment());
             } catch (\ReflectionException $e) {
-                $annotations = array();
+                $annotations = [];
             }
 
-            self::$_annotations[$className . '::' . $methodName] = $annotations;
+            self::$_annotations[$prefix][$methodName] = $annotations;
         }
 
-        return self::$_annotations[$className . '::' . $methodName];
+        return self::$_annotations[$prefix][$methodName];
+    }
+
+    /**
+     * @param string $className
+     * @param int $filter Filter methods, default return all.
+     * @return array
+     * @throws \ReflectionException
+     * @see \ReflectionMethod for filter flags
+     * like:
+     * - ReflectionMethod::IS_STATIC
+     * - ReflectionMethod::IS_PUBLIC
+     * ...
+     */
+    public function getAllMethodAnnotations(string $className, int $filter = -1): array
+    {
+        $ref = new \ReflectionClass($className);
+        $prefix = $className . '.methods';
+        $map = [];
+
+        foreach ($ref->getMethods($filter) as $refMethod) {
+            $methodName = $refMethod->getName();
+
+            if (isset(self::$_annotations[$prefix][$methodName])) {
+                $annotations = self::$_annotations[$prefix][$methodName];
+            } else {
+                $annotations = self::parseAnnotations($refMethod->getDocComment());
+            }
+
+            $map[$methodName] = $annotations;
+        }
+
+        return $map;
+    }
+
+    /**
+     * @param string $className
+     * @param int $filter Filter methods, default return all.
+     * @return \Generator
+     * @throws \ReflectionException
+     * @see \ReflectionMethod for filter flags
+     * like:
+     * - ReflectionMethod::IS_STATIC
+     * - ReflectionMethod::IS_PUBLIC
+     * ...
+     */
+    public function yieldAllMethodAnnotations(string $className, int $filter = -1)
+    {
+        $ref = new \ReflectionClass($className);
+        $prefix = $className . '.methods';
+
+        foreach ($ref->getMethods($filter) as $refMethod) {
+            $methodName = $refMethod->getName();
+
+            if (isset(self::$_annotations[$prefix][$methodName])) {
+                $annotations = self::$_annotations[$prefix][$methodName];
+            } else {
+                $annotations = self::parseAnnotations($refMethod->getDocComment());
+            }
+
+            yield $methodName => $annotations;
+        }
     }
 
     /**
@@ -122,7 +187,7 @@ final class Annotations
      * @param  string $methodName method name to get annotations
      * @return array  self::$_annotations all annotated objects of a method given
      */
-    public function getMethodAnnotationsObjects($className, $methodName): array
+    public function getMethodAnnotationsObjects(string $className, string $methodName): array
     {
         $i = 0;
         $objects = [];
@@ -169,10 +234,18 @@ final class Annotations
      */
     public static function parseAnnotations(string $docBlock): array
     {
-        $annotations = array();
+        $annotations = [];
+
+        if (!$docBlock = trim($docBlock)) {
+            return $annotations;
+        }
 
         // Strip away the doc-block header and footer to ease parsing of one line annotations
         $docBlock = (string)substr($docBlock, 3, -2);
+
+        if (!$docBlock) {
+            return $annotations;
+        }
 
         if (preg_match_all('/@(?<name>[A-Za-z_-]+)[\s\t]*\((?<args>.*)\)[\s\t]*\r?$/m', $docBlock, $matches)) {
             $name = null;
@@ -185,7 +258,7 @@ final class Annotations
                     $name = $matches['name'][$i];
                     $value = self::parseArgs($argsParts);
                 } else {
-                    $value = array();
+                    $value = [];
                 }
 
                 if ($name) {

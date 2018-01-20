@@ -6,15 +6,15 @@
  * Time: 16:07
  */
 
+use Ulue\Annotations\Annotations;
+
 require dirname(__DIR__) . '/tests/boot.php';
 
 $text = <<<CMT
 
 /**
- * This is our bean.
+ * This is some message.
  * @Component(name="myBean", id=345, status=false, map={a = v1,b = v2})
- * @InitMethod(method=init)
- * @DestroyMethod(method=destroy)
  * @Scope(value=singleton)
  * @Permission(view)
  * @Permission(edit)
@@ -25,6 +25,14 @@ $text = <<<CMT
  */
 CMT;
 
-$ret = \Ulue\Annotations\Annotations::make()->parseAnnotations($text);
+// $ret = Annotations::make()->parseAnnotations($text);
 
-var_dump($ret, $ret['Component']);
+// var_dump($ret, $ret['Component']);
+
+$ret = Annotations::make()->getAllMethodAnnotations('User');
+
+var_dump($ret);
+
+foreach ($ret as $name => $item) {
+    var_dump($name, $item);
+}

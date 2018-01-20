@@ -37,6 +37,6 @@ $files = [
 
 foreach ($files as $file) {
     if (is_file($libDir . '/' . $file)) {
-        include $file;
+        include $libDir . '/' . $file;
     }
 }
