@@ -2,6 +2,8 @@
 
 Simple and Lightweight PHP Class & Methods Annotations Reader
 
+> Forked from [eriknyk/Annotations](https://github.com/eriknyk/Annotations)
+
 Sample class User.php
 
 ```php
