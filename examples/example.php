@@ -10,29 +10,70 @@ use Ulue\Annotations\Annotations;
 
 require dirname(__DIR__) . '/tests/boot.php';
 
-$text = <<<CMT
+$docBlock = <<<DOC
+/**
+ * @Inject()
+ * @Scope(value=singleton1) @Scope(value=singleton2)
+ * @Scope(value=singleton3) @Scope(value=singleton4)
+ * @limits(start=10, limit=50)
+ * @List(items={12,56,45,67})
+ * @MultiLine(
+ *   name="myBean",
+ *   id=345,
+ *   status=false,
+ *   map={a = v1,b = v2}
+ * )
+ * @type(json)
+ * @Route(index)
+ * @Route(index2)
+ * @Response(type=json)
+ * @Apostrophe(type='json')
+ * @DoubleQuotes(type="value2")
+ */
+DOC;
+
+$ret = Annotations::parseAnnotations($docBlock);
+var_dump($ret);
+die;
 
 /**
+ * @Inject()
+ * @Scope(value=singleton1) @Scope(value=singleton2)
+ * @Scope(value=singleton3) @Scope(value=singleton4)
+ * @limits(start=10, limit=50)
+ * @List(items={12,56,45,67})
+ * @MultiLine(
+ *   name="myBean",
+ *   id=345,
+ *   status=false,
+ *   map={a = v1,b = v2}
+ * )
+ * @type(json)
+ * @Route(index)
+ * @Route(index2)
+ * @Response(type=json)
+ * @Apostrophe(type='json')
+ * @DoubleQuotes(type="value2")
+ */
+$text = <<<CMT
+/**
  * This is some message.
- * @Component(name="myBean", id=345, status=false, map={a = v1,b = v2})
  * @Scope(value=singleton)
+ * @Component(name="myBean", id=345, status=false, map={a = v1,b = v2})
+ * @MultiLine(
+ *   name="myBean", 
+ *   id=345, 
+ *   status=false, 
+ *   map={a = v1,b = v2}
+ * )
  * @Permission(view)
  * @Permission(edit)
- * @Role(administrator)
  * @cache(true)
  * @type(json)
  * @limits(start=10, limit=50)
  */
 CMT;
 
-// $ret = Annotations::make()->parseAnnotations($text);
+$ret = Annotations::parseAnnotations($text);
 
-// var_dump($ret, $ret['Component']);
-
-$ret = Annotations::make()->getAllMethodAnnotations('User');
-
-var_dump($ret);
-
-foreach ($ret as $name => $item) {
-    var_dump($name, $item);
-}
+var_dump($ret, $ret['Component']);

@@ -1,4 +1,5 @@
 <?php
+namespace Ulue\Annotations\Tests;
 
 use PHPUnit\Framework\TestCase;
 use \Ulue\Annotations\Annotations;
@@ -44,8 +45,10 @@ class AnnotationsTest extends TestCase
     }
 
     /**
-     * @covers Annotations::getClassAnnotations
+     * @covers  Annotations::getClassAnnotations
      * @depends testSetDefaultNamespace
+     * @param Annotations $annotations
+     * @throws ReflectionException
      */
     public function testGetClassAnnotations($annotations)
     {

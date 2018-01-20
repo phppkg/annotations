@@ -22,6 +22,52 @@ namespace Ulue\Annotations;
 final class Annotations
 {
     /**
+     * @var array
+     */
+    private static $ignoredTags = [
+        'Annotation' => 1,
+        'abstract' => 1,
+        'access' => 1,
+        'api' => 1,
+        'author' => 1,
+        'category' => 1,
+        'copyright' => 1,
+        'codeCoverageIgnoreStart' => 1,
+        'codeCoverageIgnoreEnd' => 1,
+        'deprecated' => 1,
+        'email' => 1,
+        'example' => 1,
+        'exception' => 1,
+        'final' => 1,
+        'filesource' => 1,
+        'global' => 1,
+        'ignore' => 1,
+        'inheritdoc' => 1,
+        'internal' => 1,
+        'license' => 1,
+        'link' => 1,
+        'magic' => 1,
+        'method' => 1,
+        'name' => 1,
+        'override' => 1,
+        'package' => 1,
+        'param' => 1,
+        'private' => 1,
+        'property' => 1,
+        'return' => 1,
+        'see' => 1,
+        'since' => 1,
+        'static' => 1,
+        'subpackage' => 1,
+        'throws' => 1,
+        'throw' => 1,
+        'todo' => 1,
+        'tutorial' => 1,
+        'uses' => 1,
+        'version' => 1,
+    ];
+
+    /**
      * Static array to store already parsed annotations
      * @var array
      */
@@ -229,40 +275,57 @@ final class Annotations
     /**
      * Parse annotations
      *
-     * @param  string $docBlock
+     * @param string $docBlock
+     * param bool $allowRepeatTag
      * @return array parsed annotations params
      */
     public static function parseAnnotations(string $docBlock): array
     {
         $annotations = [];
 
-        if (!$docBlock = trim($docBlock)) {
+        if (!$docBlock = trim($docBlock, '/')) {
             return $annotations;
         }
 
-        // Strip away the doc-block header and footer to ease parsing of one line annotations
-        $docBlock = (string)substr($docBlock, 3, -2);
+        // 去除所有的 * 符号
+        $docBlock = str_replace("\r", '',
+            trim(preg_replace('/^\s*\**( |\t)?/m', '', $docBlock))
+        );
 
         if (!$docBlock) {
             return $annotations;
         }
 
-        if (preg_match_all('/@(?<name>[A-Za-z_-]+)[\s\t]*\((?<args>.*)\)[\s\t]*\r?$/m', $docBlock, $matches)) {
-            $name = null;
-            $numMatches = \count($matches[0]);
-
-            for ($i = 0; $i < $numMatches; ++$i) {
-                // annotations has arguments
-                if (isset($matches['args'][$i])) {
-                    $argsParts = trim($matches['args'][$i]);
-                    $name = $matches['name'][$i];
-                    $value = self::parseArgs($argsParts);
-                } else {
-                    $value = [];
+        // 匹配
+        if (preg_match_all('/@([A-Za-z_-]+)[\s\t]*\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches)) {
+            /**
+             * @var array[] $matches
+             * - 0 完整模式的所有匹配
+             * - 1 由 `([A-Za-z_-]+)` 匹配到的标签 names
+             * - 2 由 `([^\)]*)` 匹配到的参数 list
+             */
+            foreach ($matches[1] as $index => $name) {
+                // skip ignored
+                if (isset(self::$ignoredTags[$name])) {
+                    continue;
                 }
 
-                if ($name) {
+                if (!isset($matches[2][$index])) {
+                    continue;
+                }
+
+                // 多行参数 去掉换行符
+                $argsParts = trim(str_replace("\n", '', $matches[2][$index]));
+                $value = self::parseArgs($argsParts);
+
+                // 第一次
+                if (!isset($annotations[$name])) {
+                    $annotations[$name] = $value;
+                    // 使用了多个相同tag
+                } elseif (isset($annotations[$name][0]) && \is_array($annotations[$name][0])) {
                     $annotations[$name][] = $value;
+                } else {
+                    $annotations[$name] = [$annotations[$name], $value];
                 }
             }
         }
@@ -278,23 +341,24 @@ final class Annotations
      */
     private static function parseArgs(string $content)
     {
-        $data = array();
+        if (!$content) {
+            return [$content];
+        }
+
+        $data = [];
         $len = \strlen($content);
         $i = 0;
-        $var = '';
-        $val = '';
+        $var = $val = '';
         $level = 1;
 
-        $prevDelimiter = '';
-        $nextDelimiter = '';
-        // $nextToken = '';
-        $composing = false;
         $type = 'plain';
+        $prevDelimiter = $nextDelimiter = '';
+        // $nextToken = '';
+        $composing = $quoted = false;
         $delimiter = null;
-        $quoted = false;
         $tokens = ['"', '"', '{', '}', ',', '='];
 
-        while ($i <= $len) {
+        while ($i < $len) {
             $c = $content[$i++] ?? '';
 
             if ($c === '\'' || $c === '"') {
@@ -316,7 +380,6 @@ final class Annotations
 
                     // validating syntax
                     if ($i < $len) {
-                        // if (',' !== substr($content, $i, 1)) {
                         if (',' !== $content[$i]) {
                             throw new \InvalidArgumentException(sprintf(
                                 'Parse Error: missing comma separator near: ...%s<--',
@@ -358,7 +421,6 @@ final class Annotations
 
                         while ($i <= $len) {
                             $c = $content[$i++] ?? '';
-                            // $c = substr($content, $i++, 1);
 
                             if (isset($delimiter) && $c === $delimiter) {
                                 throw new \InvalidArgumentException(sprintf(
@@ -393,16 +455,15 @@ final class Annotations
             }
 
             if ($level === 3 || $i === $len) {
-                if ($type === 'plain' && $i === $len) {
-                    $data = self::castValue($var);
+                if ($type === 'plain') {//  && $i === $len
+                    $data[] = self::castValue($var);
                 } else {
                     $data[trim($var)] = self::castValue($val, !$quoted);
                 }
 
                 $level = 1;
                 $var = $val = '';
-                $composing = false;
-                $quoted = false;
+                $composing = $quoted = false;
             }
         }
 
@@ -439,5 +500,37 @@ final class Annotations
         }
 
         return $val;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getIgnoredTags(): array
+    {
+        return self::$ignoredTags;
+    }
+
+    /**
+     * @param array $ignoredTags
+     */
+    public static function setIgnoredTags(array $ignoredTags)
+    {
+        self::$ignoredTags = $ignoredTags;
+    }
+
+    /**
+     * @param array $ignoredTags
+     */
+    public static function addIgnoredTags(array $ignoredTags)
+    {
+        self::$ignoredTags = array_merge(self::$ignoredTags, $ignoredTags);
+    }
+
+    /**
+     * @param string $name
+     */
+    public static function addIgnoredTag(string $name)
+    {
+        self::$ignoredTags[$name] = 1;
     }
 }
