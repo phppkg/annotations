@@ -4,6 +4,36 @@ Simple and Lightweight PHP Class & Methods Annotations Reader
 
 > Forked from [eriknyk/Annotations](https://github.com/eriknyk/Annotations)
 
+## 项目地址
+
+- **github** https://github.com/ulue/Annotations.git
+
+## 安装
+
+- composer 命令
+
+```php
+composer require ulue/annotations
+```
+
+- composer.json
+
+```json
+{
+    "require": {
+        "ulue/annotations": "dev-master"
+    }
+}
+```
+
+- 直接拉取
+
+```bash
+git clone https://github.com/ulue/Annotations.git // github
+```
+
+## 使用
+
 Sample class User.php
 
 ```php

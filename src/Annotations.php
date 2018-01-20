@@ -37,7 +37,7 @@ final class Annotations
      * Stores the default namespace for Objects instance, usually used on methods like getMethodAnnotationsObjects()
      * @var string e.g '\Annotation\\'
      */
-    public $defaultNamespace = '';
+    private $defaultNamespace = '';
 
     /**
      * @return Annotations
