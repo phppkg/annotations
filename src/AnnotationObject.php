@@ -1,11 +1,25 @@
 <?php
-namespace Base\Annotation;
+/**
+ * Created by PhpStorm.
+ * User: Inhere
+ * Date: 2018/1/20 0020
+ * Time: 16:46
+ */
 
-class Annotation
+namespace Ulue\Annotations;
+
+/**
+ * Class AnnotationObject
+ * @package Ulue\Annotations
+ */
+class AnnotationObject
 {
-    protected $data = array();
+    /**
+     * @var array
+     */
+    protected $data = [];
 
-    public function __construct($args = array())
+    public function __construct(array $args = [])
     {
         $this->data = $args;
     }
@@ -24,7 +38,7 @@ class Annotation
         return $this->data[$key];
     }
 
-    public function exists($key)
+    public function exists($key): bool
     {
         return !empty($this->data[$key]);
     }

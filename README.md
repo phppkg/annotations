@@ -1,13 +1,11 @@
-README
-=========================
-[![Build Status](https://secure.travis-ci.org/eriknyk/Annotations.png?branch=master)](http://travis-ci.org/eriknyk/Annotations)
+# README
 
 Simple and Lightweight PHP Class & Methods Annotations Reader
-===
 
 Sample class User.php
 
-    <?php
+```php
+<?php
     /**
      * @Defaults(name="user1", lastname = "sample", age='0', address={country=USA, state=NY}, phone="000-00000000")
      * @assertResult(false)
@@ -34,60 +32,69 @@ Sample class User.php
         {
         }
     }
-
+```
 
 Sample use.
 
----
-    include 'User.php';
-    $annotations = new Annotations();
-    $result = $annotations->getClassAnnotations('User');
-    print_r($result);
+- get class annotations:
+
+```php
+include 'User.php';
+$annotations = new Annotations();
+$result = $annotations->getClassAnnotations('User');
+
+print_r($result);
+```
 
 Result:
 
-    Array
-    (
-        [Defaults] => Array
-            (
-                [0] => Array
-                    (
-                        [name] => user1
-                        [lastname] => sample
-                        [age] => 0
-                        [address] => Array
-                            (
-                                [country] => USA
-                                [state] => NY
-                            )
+```php
+Array
+(
+    [Defaults] => Array
+        (
+            [0] => Array
+                (
+                    [name] => user1
+                    [lastname] => sample
+                    [age] => 0
+                    [address] => Array
+                        (
+                            [country] => USA
+                            [state] => NY
+                        )
 
-                        [phone] => 000-00000000
-                    )
+                    [phone] => 000-00000000
+                )
 
-            )
+        )
 
-        [assertResult] => Array
-            (
-                [0] => false
-            )
+    [assertResult] => Array
+        (
+            [0] => false
+        )
 
-        [cache] => Array
-            (
-                [0] => Array
-                    (
-                        [collation] => UTF-8
-                    )
+    [cache] => Array
+        (
+            [0] => Array
+                (
+                    [collation] => UTF-8
+                )
 
-            )
+        )
 
-    )
----
+)
+```
+- get method annotations:
 
-    $result = $annotations->getMethodAnnotations('User', 'create');
-    print_r($result);
+```php
+$result = $annotations->getMethodAnnotations('User', 'create');
+print_r($result);
+```
 
 Result:
 
+```php
     Array
     (
         [Permission] => Array
@@ -102,17 +109,16 @@ Result:
             )
 
     )
+```
 
----
+### Creating Annotated objects.
 
-Creating Annotated objects.
----
 You can crate fast annotated objects.
 
 Sample Annotated Classes.
 
----
-    <?php
+```php
+<?php
     // Annotation.php
 
     abstract class Annotation
@@ -143,40 +149,40 @@ Sample Annotated Classes.
             return isset($this->data[$key]);
         }
     }
+```
 
----
-
-    <?php
+```php
+<?php
     // PermissionAnnotation.php
     namespace Annotation;
 
     class PermissionAnnotation extends Annotation
     {
     }
+```
 
----
-
-    <?php
+```
+<?php
     namespace Base\Annotation;
     // RoleAnnotation.php
 
     class RoleAnnotation extends Annotation
     {
     }
+```
 
----
+```php
+require dirname(__DIR__) . '/tests/boot.php';
 
-    require_once 'Annotation/Annotation.php';
-    require_once 'Annotation/PermissionAnnotation.php';
-    require_once 'Annotation/RoleAnnotation.php';
-
-    $annotations->setDefaultAnnotationNamespace('\Annotation\\');
-    $result = $annotations->getMethodAnnotationsObjects('User', 'create');
-    print_r($result);
+$annotations->setDefaultAnnotationNamespace('\Annotation\\');
+$result = $annotations->getMethodAnnotationsObjects('User', 'create');
+print_r($result);
+```
 
 Result:
 
-    Array
+```text
+Array
     (
         [Permission] => Base\Annotation\PermissionAnnotation Object
             (
@@ -198,5 +204,14 @@ Result:
             )
 
     )
----
+```
 
+## unit test
+
+```base
+phpunit
+```
+
+## LICENSE
+
+MIT

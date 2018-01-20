@@ -1,18 +1,27 @@
 {
-    "name": "eriknyk/Annotations",
-    "type": "library",
-    "description": "Simple and Lightweight PHP Class & Methods Annotations Reader",
-    "keywords": [],
-    "homepage": "https://github.com/eriknyk/Annotations",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Erik Amaru Ortiz",
-            "email": "aortiz.erik@gmail.com"
-        }
-    ],
-    "autoload": {
-        "psr-0": { "Alchemy\\Component\\Annotations\\": "" }
+  "name": "ulue/Annotations",
+  "type": "library",
+  "description": "Simple and Lightweight PHP Class & Methods Annotations Reader",
+  "keywords": [],
+  "homepage": "https://github.com/ulue/Annotations",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Erik Amaru Ortiz",
+      "email": "aortiz.erik@gmail.com"
     },
-    "target-dir": "Alchemy/Component/Annotations"
+    {
+      "name": "inhere",
+      "email": "in.798@qq.com",
+      "homepage": "http://www.yzone.net/"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ulue\\Annotations\\": "src/"
+    }
+  }
 }
