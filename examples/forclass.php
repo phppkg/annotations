@@ -10,7 +10,7 @@ use Ulue\Annotations\Annotations;
 
 require dirname(__DIR__) . '/tests/boot.php';
 
-$ret = Annotations::make()->yieldAllMethodAnnotations('User');
+$ret = Annotations::make()->yieldMethodsAnnotations('User');
 
 // var_dump($ret);
 

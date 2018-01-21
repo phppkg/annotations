@@ -74,6 +74,12 @@ final class Annotations
     private static $_annotations;
 
     /**
+     * cached class reflections
+     * @var \ReflectionClass[]
+     */
+    private static $reflections = [];
+
+    /**
      * Indicates that annotations should has strict behavior, 'false' by default
      * @var boolean
      */
@@ -132,7 +138,7 @@ final class Annotations
         $key = $className . '.class';
 
         if (!isset(self::$_annotations[$key])) {
-            $class = new \ReflectionClass($className);
+            $class = self::createReflection($className);
             self::$_annotations[$key] = self::parseAnnotations($class->getDocComment());
         }
 
@@ -175,9 +181,9 @@ final class Annotations
      * - ReflectionMethod::IS_PUBLIC
      * ...
      */
-    public function getAllMethodAnnotations(string $className, int $filter = -1): array
+    public function getMethodsAnnotations(string $className, int $filter = -1): array
     {
-        $ref = new \ReflectionClass($className);
+        $ref = self::createReflection($className);
         $prefix = $className . '.methods';
         $map = [];
 
@@ -207,7 +213,7 @@ final class Annotations
      * - ReflectionMethod::IS_PUBLIC
      * ...
      */
-    public function yieldAllMethodAnnotations(string $className, int $filter = -1)
+    public function yieldMethodsAnnotations(string $className, int $filter = -1)
     {
         $ref = new \ReflectionClass($className);
         $prefix = $className . '.methods';
@@ -500,6 +506,20 @@ final class Annotations
         }
 
         return $val;
+    }
+
+    /**
+     * @param string $class
+     * @return \ReflectionClass
+     * @throws \ReflectionException
+     */
+    public static function createReflection(string $class): \ReflectionClass
+    {
+        if (isset(self::$reflections[$class])) {
+            self::$reflections[$class] = new \ReflectionClass($class);
+        }
+
+        return self::$reflections[$class];
     }
 
     /**
