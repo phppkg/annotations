@@ -17,6 +17,7 @@ $docBlock = <<<DOC
  * @Scope(value=singleton3) @Scope(value=singleton4)
  * @limits(start=10, limit=50)
  * @List(items={12,56,45,67})
+ * @Route(methods={"GET", "POST"})
  * @MultiLine(
  *   name="myBean",
  *   id=345,
@@ -24,8 +25,6 @@ $docBlock = <<<DOC
  *   map={a = v1,b = v2}
  * )
  * @type(json)
- * @Route(index)
- * @Route(index2)
  * @Response(type=json)
  * @Apostrophe(type='json')
  * @DoubleQuotes(type="value2")

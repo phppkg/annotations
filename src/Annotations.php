@@ -515,7 +515,7 @@ final class Annotations
      */
     public static function createReflection(string $class): \ReflectionClass
     {
-        if (isset(self::$reflections[$class])) {
+        if (!isset(self::$reflections[$class])) {
             self::$reflections[$class] = new \ReflectionClass($class);
         }
 
