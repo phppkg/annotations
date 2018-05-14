@@ -14,8 +14,8 @@ spl_autoload_register(function($class)
         $path = str_replace('\\', '/', substr($class, strlen('Ulue\Annotations\Examples\\')));
         $file = dirname(__DIR__) . "/examples/{$path}.php";
 
-    } elseif (0 === strpos($class,'Ulue\Annotations\Tests\\')) {
-        $path = str_replace('\\', '/', substr($class, strlen('Ulue\Annotations\Tests\\')));
+    } elseif (0 === strpos($class,'Ulue\Annotations\Test\\')) {
+        $path = str_replace('\\', '/', substr($class, strlen('Ulue\Annotations\Test\\')));
         $file = __DIR__ . "/{$path}.php";
     } elseif (0 === strpos($class,'Ulue\Annotations\\')) {
         $path = str_replace('\\', '/', substr($class, strlen('Ulue\Annotations\\')));

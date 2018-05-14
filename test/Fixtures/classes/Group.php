@@ -13,8 +13,8 @@
 class Group
 {
     /**
-     * @Attribute(firstname)
-     * @Attribute(lastname)
+     * @Attribute(first-name)
+     * @Attribute(last-name)
      * @Cache(max_time = 50)
      * @testAll(bool_var = false, int_var = 12345, float_var = 12345.6789, str_var = 'hello', str_woq=word,str_wq='hello word')
      * @testAll(name=erik, age=27, address={city="La paz", country="Bolivia", avenue='El Prado', building='Alameda', floor=15, dep_num=7}, phone=1234567890)
@@ -25,6 +25,7 @@ class Group
      */
     public function build($id)
     {
+        return false;
     }
 
     /**
@@ -38,6 +39,7 @@ class Group
      */
     public function getAll()
     {
+        return [];
     }
 
     /**
@@ -57,7 +59,7 @@ class Group
     /**
      * @sample(err_var="1 + 1 = 2, 2+2 = 4", test_var = 'log text, {0}={1} to params...', sample={a=1,b=2,c=3})
      */
-    public function shouldworks()
+    public function shouldWorks()
     {
     }
 }

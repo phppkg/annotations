@@ -1,5 +1,5 @@
 <?php
-namespace Ulue\Annotations\Tests;
+namespace Ulue\Annotations\Test;
 
 use PHPUnit\Framework\TestCase;
 use \Ulue\Annotations\Annotations;
