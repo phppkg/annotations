@@ -61,13 +61,20 @@ final class AnnotationParser
     ];
 
     /**
+     * @var array
+     * [tag name => 1]
+     */
+    private static $allowMultiTags = [];
+
+    /**
      * Parse annotations
      *
-     * @param string $docBlock
-     * param bool $allowRepeatTag
-     * @return array parsed annotations params
+     * @param string $docBlock The doc block string.
+     * @param bool $nameAsKey use tag name as index key.(NOTICE: repeat tag will override)
+     * @return array parsed annotations data
+     * @throws \InvalidArgumentException
      */
-    public static function parse(string $docBlock): array
+    public static function parse(string $docBlock, bool $nameAsKey = false): array
     {
         $annotations = [];
 
@@ -76,8 +83,8 @@ final class AnnotationParser
         }
 
         // 去除所有的 * 符号
-        $docBlock = str_replace("\r", '',
-            trim(preg_replace('/^\s*\**( |\t)?/m', '', $docBlock))
+        $docBlock = \str_replace("\r", '',
+            \trim(\preg_replace('/^\s*\**( |\t)?/m', '', $docBlock))
         );
 
         if (!$docBlock) {
@@ -85,7 +92,7 @@ final class AnnotationParser
         }
 
         // 匹配
-        if (preg_match_all('/@([A-Za-z_-]+)[\s\t]*\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches)) {
+        if (\preg_match_all('/@([A-Za-z_-]+)[\s\t]*\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches)) {
             /**
              * @var array[] $matches
              * - 0 完整模式的所有匹配
@@ -103,18 +110,27 @@ final class AnnotationParser
                 }
 
                 // 多行参数 去掉换行符
-                $argsParts = trim(str_replace("\n", '', $matches[2][$index]));
-                $value = self::parseArgs($argsParts);
+                $argsParts = \trim(\str_replace("\n", '', $matches[2][$index]));
+                $argsData = self::parseArgs($argsParts);
+                $annotations[] = [$name, $argsData];
+            }
 
-                // 第一次
-                if (!isset($annotations[$name])) {
-                    $annotations[$name] = $value;
-                    // 使用了多个相同tag
-                } elseif (isset($annotations[$name][0]) && \is_array($annotations[$name][0])) {
-                    $annotations[$name][] = $value;
-                } else {
-                    $annotations[$name] = [$annotations[$name], $value];
+            unset($matches);
+
+            // use tag name as index key
+            if ($nameAsKey) {
+                $tagMap = [];
+
+                foreach ($annotations as list($name, $data)) {
+                    if (isset(self::$allowMultiTags[$name])) {
+                        $tagMap[$name][] = $data;
+                    } else {
+                        $tagMap[$name] = $data;
+                    }
                 }
+
+                unset($annotations);
+                return $tagMap;
             }
         }
 
@@ -126,11 +142,12 @@ final class AnnotationParser
      *
      * @param  string $content arguments string
      * @return array|string  annotated arguments
+     * @throws \InvalidArgumentException
      */
-    private static function parseArgs(string $content)
+    private static function parseArgs(string $content): array
     {
         if (!$content) {
-            return [$content];
+            return [];
         }
 
         $data = [];
@@ -171,7 +188,7 @@ final class AnnotationParser
                         if (',' !== $content[$i]) {
                             throw new \InvalidArgumentException(sprintf(
                                 'Parse Error: missing comma separator near: ...%s<--',
-                                substr($content, $i - 10, $i)
+                                \substr($content, $i - 10, $i)
                             ));
                         }
                     }
@@ -204,7 +221,7 @@ final class AnnotationParser
                         $prevDelimiter = $nextDelimiter = '';
                         break;
                     case '{':
-                        $subc = '';
+                        $subC = '';
                         $subComposing = true;
 
                         while ($i <= $len) {
@@ -220,18 +237,18 @@ final class AnnotationParser
                                 $subComposing = false;
                                 break;
                             }
-                            $subc .= $c;
+                            $subC .= $c;
                         }
 
                         // if the string is composing yet means that the structure of var. never was enclosed with '}'
                         if ($subComposing) {
                             throw new \InvalidArgumentException(sprintf(
                                 "Parse Error: Composite variable is not enclosed correctly. near: ...%s'",
-                                $subc
+                                $subC
                             ));
                         }
 
-                        $val = self::parseArgs($subc);
+                        $val = self::parseArgs($subC);
                         break;
                 }
             } else {
@@ -303,15 +320,17 @@ final class AnnotationParser
     }
 
     /**
-     * @param array $ignoredTags
+     * @param string[] $ignoredTags
      */
     public static function setIgnoredTags(array $ignoredTags)
     {
-        self::$ignoredTags = $ignoredTags;
+        foreach ($ignoredTags as $tag) {
+            self::$ignoredTags[$tag] = 1;
+        }
     }
 
     /**
-     * @param array|string $tagNames
+     * @param string[]|string $tagNames
      */
     public static function notIgnoreTags($tagNames)
     {
@@ -327,7 +346,7 @@ final class AnnotationParser
      */
     public static function addIgnoredTags(array $ignoredTags)
     {
-        self::$ignoredTags = \array_merge(self::$ignoredTags, $ignoredTags);
+        self::setIgnoredTags($ignoredTags);
     }
 
     /**
@@ -336,5 +355,23 @@ final class AnnotationParser
     public static function addIgnoredTag(string $name)
     {
         self::$ignoredTags[$name] = 1;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getAllowMultiTags(): array
+    {
+        return self::$allowMultiTags;
+    }
+
+    /**
+     * @param array $allowMultiTags
+     */
+    public static function setAllowMultiTags(array $allowMultiTags)
+    {
+        foreach ($allowMultiTags as $tag) {
+            self::$allowMultiTags[$tag] = 1;
+        }
     }
 }

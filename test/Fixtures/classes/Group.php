@@ -37,7 +37,7 @@ class Group
      *
      * @return array $list array containing all users objects
      */
-    public function getAll()
+    public function getAll(): array
     {
         return [];
     }

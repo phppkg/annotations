@@ -27,12 +27,12 @@ spl_autoload_register(function($class)
     }
 });
 
-$libDir = dirname(__DIR__);
+$libDir = __DIR__;
 $files = [
-    'tests/Fixtures/classes/User.php',
-    'tests/Fixtures/classes/Group.php',
-    'tests/Fixtures/classes/Base/Annotation/PermissionAnnotation.php',
-    'tests/Fixtures/classes/Base/Annotation/RoleAnnotation.php',
+    'Fixtures/classes/User.php',
+    'Fixtures/classes/Group.php',
+    'Fixtures/classes/Base/Annotation/PermissionAnnotation.php',
+    'Fixtures/classes/Base/Annotation/RoleAnnotation.php',
 ];
 
 foreach ($files as $file) {

@@ -3,6 +3,7 @@
 namespace Ulue\Annotations\Test;
 
 use PHPUnit\Framework\TestCase;
+use Ulue\Annotations\AnnotationParser;
 use Ulue\Annotations\Annotations;
 
 /**
@@ -10,10 +11,10 @@ use Ulue\Annotations\Annotations;
  */
 class Annotations2Test extends TestCase
 {
+    protected $object;
     /**
      * @var Annotations
      */
-    protected $object;
     private $annotations;
 
     /**
@@ -35,10 +36,11 @@ class Annotations2Test extends TestCase
 
     /**
      * @covers \Ulue\Annotations\Annotations::getClassAnnotations
+     * @throws \ReflectionException
      */
     public function testGetClassAnnotations()
     {
-        $result = $this->annotations->getClassAnnotations('\Group');
+        $result = $this->annotations->getClassAnnotations(\Group::class);
         // Note.- that reserved doc annotations like author, version, etc. will be ommitted
         //        the user class has @author and @version annotations keys, and them should be ommited
 
@@ -77,46 +79,48 @@ class Annotations2Test extends TestCase
      */
     public function testGetMethodAnnotations()
     {
-        $result = $this->annotations->getMethodAnnotations('\Group', 'build');
+        AnnotationParser::setAllowMultiTags(['Attribute', 'testAll']);
+
+        $result = $this->annotations->getMethodAnnotations(\Group::class, 'build');
         // Note.- that reserved doc annotations like author, version, etc. will be ommitted
         //        the build method has @param and @return annotations keys, and them should be ommited
 
         $expected = Array(
-            "Attribute" => Array(
-                0 => "firstname",
-                1 => "lastname"
+            'Attribute' => Array(
+                0 => 'firstname',
+                1 => 'lastname'
             ),
 
-            "Cache" => Array(
+            'Cache' => Array(
                 0 => Array(
-                    "max_time" => 50
+                    'max_time' => 50
                 )
             ),
-            "testAll" => Array(
+            'testAll' => Array(
                 0 => Array(
-                    "bool_var" => false,
-                    "int_var" => 12345,
-                    "float_var" => 12345.6789,
-                    "str_var" => "hello",
-                    "str_woq" => "word",
-                    "str_wq" => "hello word"
+                    'bool_var' => false,
+                    'int_var' => 12345,
+                    'float_var' => 12345.6789,
+                    'str_var' => 'hello',
+                    'str_woq' => 'word',
+                    'str_wq' => 'hello word'
                 ),
                 1 => Array(
-                    "name" => "erik",
-                    "age" => 27,
-                    "address" => Array(
-                        "city" => "La paz",
-                        "country" => "Bolivia",
-                        "avenue" => "El Prado",
-                        "building" => "Alameda",
-                        "floor" => 15,
-                        "dep_num" => 7
+                    'name' => 'erik',
+                    'age' => 27,
+                    'address' => Array(
+                        'city' => 'La paz',
+                        'country' => 'Bolivia',
+                        'avenue' => 'El Prado',
+                        'building' => 'Alameda',
+                        'floor' => 15,
+                        'dep_num' => 7
                     ),
-                    "phone" => 1234567890
+                    'phone' => 1234567890
                 )
             ),
-            "Description" => Array(
-                0 => "Your system 升级难道每次都要卸载重装？"
+            'Description' => Array(
+                0 => 'Your system 升级难道每次都要卸载重装？'
             )
         );
 
@@ -128,7 +132,7 @@ class Annotations2Test extends TestCase
      */
     public function testErrorMissingCloseBrace()
     {
-        $result = $this->annotations->getMethodAnnotations('\Group', 'errFunc1');
+        $this->annotations->getMethodAnnotations(\Group::class, 'errFunc1');
     }
 
     /**
@@ -136,7 +140,7 @@ class Annotations2Test extends TestCase
      */
     public function testErrorMissingCloseQuote()
     {
-        $result = $this->annotations->getMethodAnnotations('\Group', 'errFunc2');
+        $this->annotations->getMethodAnnotations(\Group::class, 'errFunc2');
     }
 
     /**

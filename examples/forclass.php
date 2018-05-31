@@ -8,12 +8,15 @@
 
 use Ulue\Annotations\Annotations;
 
-require dirname(__DIR__) . '/tests/boot.php';
+require dirname(__DIR__) . '/test/boot.php';
 
-$ret = Annotations::make()->yieldMethodsAnnotations('User');
+$an = Annotations::make([
+    'nameAsKey' => true,
+]);
+// var_dump($an);die;
+$ret = $an->yieldMethodsAnnotations(\User::class);
 
 // var_dump($ret);
-
-foreach ($ret as $name => $item) {
-    var_dump($name, $item);
+foreach ($ret as $key => $item) {
+    var_dump($key, $item);
 }

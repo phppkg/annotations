@@ -35,8 +35,11 @@ final class Annotations
     private static $reflections = [];
 
     /**
+     * You can set the tag class map
      * @var array
-     * [ name => class ]
+     * [
+     *  tag name => full class
+     * ]
      */
     private static $tagClasses = [];
 
@@ -53,11 +56,36 @@ final class Annotations
     private $defaultNamespace = '';
 
     /**
+     * @var string
+     */
+    private $tagClassSuffix = 'Annotation';
+
+    /**
+     * use tag name as annotations data key
+     * @var bool
+     */
+    private $nameAsKey = false;
+
+    /**
+     * @param array $config
      * @return Annotations
      */
-    public static function make(): Annotations
+    public static function make(array $config = []): Annotations
     {
-        return new self;
+        return new self($config);
+    }
+
+    /**
+     * Annotations constructor.
+     * @param array $config
+     */
+    public function __construct(array $config = [])
+    {
+        foreach ($config as $name => $value) {
+            if (\method_exists($this, $setter = 'set' . \ucfirst($name))) {
+                $this->$setter($value);
+            }
+        }
     }
 
     /**
@@ -100,7 +128,7 @@ final class Annotations
 
         if (!isset(self::$_annotations[$key])) {
             $class = self::createReflection($className);
-            self::$_annotations[$key] = AnnotationParser::parse($class->getDocComment());
+            self::$_annotations[$key] = AnnotationParser::parse($class->getDocComment(), $this->nameAsKey);
         }
 
         return self::$_annotations[$key];
@@ -112,6 +140,20 @@ final class Annotations
      * @param  string $className class name
      * @param  string $methodName method name to get annotations
      * @return array[]  self::$_annotations all annotated elements of a method given
+     *
+     * $this->useNameAsKey is true
+     * [
+     *  'tag0' => [arg0 => val0, arg1 => val1, ...]
+     * ]
+     *
+     * $this->useNameAsKey is false
+     * [
+     *  [
+     *      'tag0',
+     *      [arg0 => val0, arg1 => val1, ...]
+     *  ]
+     * ]
+     *
      */
     public function getMethodAnnotations(string $className, string $methodName = null): array
     {
@@ -120,7 +162,7 @@ final class Annotations
         if (!isset(self::$_annotations[$prefix][$methodName])) {
             try {
                 $method = new \ReflectionMethod($className, $methodName);
-                $annotations = AnnotationParser::parse($method->getDocComment());
+                $annotations = AnnotationParser::parse($method->getDocComment(), $this->nameAsKey);
             } catch (\ReflectionException $e) {
                 $annotations = [];
             }
@@ -154,7 +196,7 @@ final class Annotations
             if (isset(self::$_annotations[$prefix][$methodName])) {
                 $annotations = self::$_annotations[$prefix][$methodName];
             } else {
-                $annotations = AnnotationParser::parse($refMethod->getDocComment());
+                $annotations = AnnotationParser::parse($refMethod->getDocComment(), $this->nameAsKey);
             }
 
             $map[$methodName] = $annotations;
@@ -185,7 +227,7 @@ final class Annotations
             if (isset(self::$_annotations[$prefix][$methodName])) {
                 $annotations = self::$_annotations[$prefix][$methodName];
             } else {
-                $annotations = AnnotationParser::parse($refMethod->getDocComment());
+                $annotations = AnnotationParser::parse($refMethod->getDocComment(), $this->nameAsKey);
             }
 
             yield $methodName => $annotations;
@@ -199,6 +241,7 @@ final class Annotations
      * @param  string $className class name
      * @param  string $methodName method name to get annotations
      * @return array  self::$_annotations all annotated objects of a method given
+     * @throws \RuntimeException
      */
     public function getMethodAnnotationsObjects(string $className, string $methodName): array
     {
@@ -206,21 +249,22 @@ final class Annotations
         $objects = [];
         $annotations = $this->getMethodAnnotations($className, $methodName);
 
-        foreach ($annotations as $annotationTag => $listParams) {
-            if (isset(self::$tagClasses[$annotationTag])) {
-                $class = self::$tagClasses[$annotationTag];
+        //
+        foreach ($annotations as $index => $listParams) {
+            if (isset(self::$tagClasses[$index])) {
+                $class = self::$tagClasses[$index];
             } else {
-                $class = $this->defaultNamespace . \ucfirst($annotationTag) . 'Annotation';
+                $class = $this->defaultNamespace . \ucfirst($index) . $this->tagClassSuffix;
             }
 
             // verify is the annotation class exists, depending if Annotations::strict is true
             // if not, just skip the annotation instance creation.
-            if (!class_exists($class)) {
+            if (!\class_exists($class)) {
                 if ($this->strict) {
                     throw new \RuntimeException(sprintf(
                         'Annotation Class Not Found: %s for the tag: %s',
                         $class,
-                        $annotationTag
+                        $index
                     ));
                 }
 
@@ -228,17 +272,17 @@ final class Annotations
                 continue;
             }
 
-            if (empty($objects[$annotationTag])) {
-                $objects[$annotationTag] = new $class();
+            if (empty($objects[$index])) {
+                $objects[$index] = new $class();
             }
 
             foreach ($listParams as $params) {
                 if (\is_array($params)) {
                     foreach ($params as $key => $value) {
-                        $objects[$annotationTag]->set($key, $value);
+                        $objects[$index]->set($key, $value);
                     }
                 } else {
-                    $objects[$annotationTag]->set($i++, $params);
+                    $objects[$index]->set($i++, $params);
                 }
             }
         }
@@ -293,5 +337,37 @@ final class Annotations
     public static function addTagClass(string $tag, string $class)
     {
         self::$tagClasses[$tag] = $class;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTagClassSuffix(): string
+    {
+        return $this->tagClassSuffix;
+    }
+
+    /**
+     * @param string $tagClassSuffix
+     */
+    public function setTagClassSuffix(string $tagClassSuffix)
+    {
+        $this->tagClassSuffix = $tagClassSuffix;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNameAsKey(): bool
+    {
+        return $this->nameAsKey;
+    }
+
+    /**
+     * @param bool $nameAsKey
+     */
+    public function setNameAsKey($nameAsKey)
+    {
+        $this->nameAsKey = (bool)$nameAsKey;
     }
 }
