@@ -23,7 +23,7 @@ class Group
      * @param $id string user id
      * @return bool result at build user structure process
      */
-    public function build($id)
+    public function build($id): bool
     {
         return false;
     }

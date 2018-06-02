@@ -26,10 +26,12 @@ $docBlock = <<<DOC
  * @Response(type=json)
  * @Apostrophe(type='json')
  * @DoubleQuotes(type="value2")
+ * @Route(route="{id}", method="GET", params={"id"="[1-9]\d*"})
+ * @Route(route="{alias}", method="GET", params={"alias"="[a-zA-Z][\w-]+(?:.html)?"})
  */
 DOC;
 
 $nameAsKey = true;
-$ret = \Ulue\Annotations\AnnotationParser::parse($docBlock, $nameAsKey);
+$ret = \Ulue\Annotations\AnnotationParser::make()->parse($docBlock, $nameAsKey);
 var_dump($ret);
 

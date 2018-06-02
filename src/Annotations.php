@@ -50,6 +50,11 @@ final class Annotations
     private $strict = false;
 
     /**
+     * @var AnnotationParser
+     */
+    private $parser;
+
+    /**
      * Stores the default namespace for Objects instance, usually used on methods like getMethodAnnotationsObjects()
      * @var string e.g '\Annotation\\'
      */
@@ -61,31 +66,29 @@ final class Annotations
     private $tagClassSuffix = 'Annotation';
 
     /**
-     * use tag name as annotations data key
-     * @var bool
-     */
-    private $nameAsKey = false;
-
-    /**
      * @param array $config
+     * @param AnnotationParser|null $parser
      * @return Annotations
      */
-    public static function make(array $config = []): Annotations
+    public static function make(array $config = [], AnnotationParser $parser = null): Annotations
     {
-        return new self($config);
+        return new self($config, $parser);
     }
 
     /**
      * Annotations constructor.
      * @param array $config
+     * @param AnnotationParser|null $parser
      */
-    public function __construct(array $config = [])
+    public function __construct(array $config = [], AnnotationParser $parser = null)
     {
         foreach ($config as $name => $value) {
             if (\method_exists($this, $setter = 'set' . \ucfirst($name))) {
                 $this->$setter($value);
             }
         }
+
+        $this->parser = $parser ?: new AnnotationParser();
     }
 
     /**
@@ -119,16 +122,18 @@ final class Annotations
      * Gets all annotations with pattern @SomeAnnotation() from a given class
      *
      * @param  string $className class name to get annotations
+     * @param  bool $nameAsKey use tag name as annotations data key
      * @return array  self::$_annotations all annotated elements
+     * @throws \InvalidArgumentException
      * @throws \ReflectionException
      */
-    public function getClassAnnotations(string $className): array
+    public function getClassAnnotations(string $className, bool $nameAsKey = false): array
     {
         $key = $className . '.class';
 
         if (!isset(self::$_annotations[$key])) {
             $class = self::createReflection($className);
-            self::$_annotations[$key] = AnnotationParser::parse($class->getDocComment(), $this->nameAsKey);
+            self::$_annotations[$key] = $this->parser->parse($class->getDocComment(), $nameAsKey);
         }
 
         return self::$_annotations[$key];
@@ -139,14 +144,15 @@ final class Annotations
      *
      * @param  string $className class name
      * @param  string $methodName method name to get annotations
+     * @param  bool $nameAsKey
      * @return array[]  self::$_annotations all annotated elements of a method given
      *
-     * $this->useNameAsKey is true
+     * $useNameAsKey is true
      * [
      *  'tag0' => [arg0 => val0, arg1 => val1, ...]
      * ]
      *
-     * $this->useNameAsKey is false
+     * $useNameAsKey is false
      * [
      *  [
      *      'tag0',
@@ -154,15 +160,16 @@ final class Annotations
      *  ]
      * ]
      *
+     * @throws \InvalidArgumentException
      */
-    public function getMethodAnnotations(string $className, string $methodName = null): array
+    public function getMethodAnnotations(string $className, string $methodName, bool $nameAsKey = false): array
     {
         $prefix = $className . '.methods';
 
         if (!isset(self::$_annotations[$prefix][$methodName])) {
             try {
                 $method = new \ReflectionMethod($className, $methodName);
-                $annotations = AnnotationParser::parse($method->getDocComment(), $this->nameAsKey);
+                $annotations = $this->parser->parse($method->getDocComment(), $nameAsKey);
             } catch (\ReflectionException $e) {
                 $annotations = [];
             }
@@ -176,7 +183,9 @@ final class Annotations
     /**
      * @param string $className
      * @param int $filter Filter methods, default return all.
+     * @param  bool $nameAsKey use tag name as annotations data key
      * @return array
+     * @throws \InvalidArgumentException
      * @throws \ReflectionException
      * @see \ReflectionMethod for filter flags
      * like:
@@ -184,7 +193,7 @@ final class Annotations
      * - ReflectionMethod::IS_PUBLIC
      * ...
      */
-    public function getMethodsAnnotations(string $className, int $filter = -1): array
+    public function getMethodsAnnotations(string $className, int $filter = -1, bool $nameAsKey = false): array
     {
         $ref = self::createReflection($className);
         $prefix = $className . '.methods';
@@ -196,7 +205,7 @@ final class Annotations
             if (isset(self::$_annotations[$prefix][$methodName])) {
                 $annotations = self::$_annotations[$prefix][$methodName];
             } else {
-                $annotations = AnnotationParser::parse($refMethod->getDocComment(), $this->nameAsKey);
+                $annotations = $this->parser->parse($refMethod->getDocComment(), $nameAsKey);
             }
 
             $map[$methodName] = $annotations;
@@ -208,7 +217,9 @@ final class Annotations
     /**
      * @param string $className
      * @param int $filter Filter methods, default return all.
+     * @param  bool $nameAsKey use tag name as annotations data key
      * @return \Generator
+     * @throws \InvalidArgumentException
      * @throws \ReflectionException
      * @see \ReflectionMethod for filter flags
      * like:
@@ -216,7 +227,7 @@ final class Annotations
      * - ReflectionMethod::IS_PUBLIC
      * ...
      */
-    public function yieldMethodsAnnotations(string $className, int $filter = -1)
+    public function yieldMethodsAnnotations(string $className, int $filter = -1, bool $nameAsKey = false)
     {
         $ref = new \ReflectionClass($className);
         $prefix = $className . '.methods';
@@ -227,7 +238,7 @@ final class Annotations
             if (isset(self::$_annotations[$prefix][$methodName])) {
                 $annotations = self::$_annotations[$prefix][$methodName];
             } else {
-                $annotations = AnnotationParser::parse($refMethod->getDocComment(), $this->nameAsKey);
+                $annotations = $this->parser->parse($refMethod->getDocComment(), $nameAsKey);
             }
 
             yield $methodName => $annotations;
@@ -240,21 +251,22 @@ final class Annotations
      *
      * @param  string $className class name
      * @param  string $methodName method name to get annotations
+     * @param  bool $nameAsKey use tag name as annotations data key
      * @return array  self::$_annotations all annotated objects of a method given
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public function getMethodAnnotationsObjects(string $className, string $methodName): array
+    public function getMethodAnnotationsObjects(string $className, string $methodName, bool $nameAsKey = false): array
     {
-        $i = 0;
         $objects = [];
         $annotations = $this->getMethodAnnotations($className, $methodName);
 
         //
-        foreach ($annotations as $index => $listParams) {
-            if (isset(self::$tagClasses[$index])) {
-                $class = self::$tagClasses[$index];
+        foreach ($annotations as list($name, $data)) {
+            if (isset(self::$tagClasses[$name])) {
+                $class = self::$tagClasses[$name];
             } else {
-                $class = $this->defaultNamespace . \ucfirst($index) . $this->tagClassSuffix;
+                $class = $this->defaultNamespace . \ucfirst($name) . $this->tagClassSuffix;
             }
 
             // verify is the annotation class exists, depending if Annotations::strict is true
@@ -264,7 +276,7 @@ final class Annotations
                     throw new \RuntimeException(sprintf(
                         'Annotation Class Not Found: %s for the tag: %s',
                         $class,
-                        $index
+                        $name
                     ));
                 }
 
@@ -272,18 +284,10 @@ final class Annotations
                 continue;
             }
 
-            if (empty($objects[$index])) {
-                $objects[$index] = new $class();
-            }
-
-            foreach ($listParams as $params) {
-                if (\is_array($params)) {
-                    foreach ($params as $key => $value) {
-                        $objects[$index]->set($key, $value);
-                    }
-                } else {
-                    $objects[$index]->set($i++, $params);
-                }
+            if ($nameAsKey) {
+                $objects[$name] = new $class($data);
+            } else {
+                $objects[] = new $class($data);
             }
         }
 
@@ -356,18 +360,10 @@ final class Annotations
     }
 
     /**
-     * @return bool
+     * @return AnnotationParser
      */
-    public function isNameAsKey(): bool
+    public function getParser(): AnnotationParser
     {
-        return $this->nameAsKey;
-    }
-
-    /**
-     * @param bool $nameAsKey
-     */
-    public function setNameAsKey($nameAsKey)
-    {
-        $this->nameAsKey = (bool)$nameAsKey;
+        return $this->parser;
     }
 }

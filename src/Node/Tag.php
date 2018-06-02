@@ -2,18 +2,28 @@
 /**
  * Created by PhpStorm.
  * User: Inhere
- * Date: 2018/1/20 0020
- * Time: 16:46
+ * Date: 2018/6/2 0002
+ * Time: 11:59
  */
 
-namespace Ulue\Annotations;
+namespace Ulue\Annotations\Node;
 
 /**
- * Class AnnotationObject
- * @package Ulue\Annotations
+ * Class Tag
+ * @package Ulue\Annotations\Node
  */
-class AnnotationObject
+class Tag
 {
+    /**
+     * @var string Tag name
+     */
+    public $name;
+
+    /**
+     * @var string description text
+     */
+    public $description;
+
     /**
      * @var array
      */
@@ -60,4 +70,3 @@ class AnnotationObject
         return !empty($this->data[$key]);
     }
 }
-
