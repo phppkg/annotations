@@ -8,12 +8,16 @@
 
 namespace Ulue\Annotations;
 
+use Ulue\Annotations\Full\TagContentParser;
+
 /**
  * Class AnnotationParser
  * @package Ulue\Annotations
  */
 final class AnnotationParser extends AbstractParser
 {
+    const TOKENS = ['"', '"', '{', '}', ',', '='];
+
     /**
      * @param string $docBlock
      * @return array
@@ -61,8 +65,9 @@ final class AnnotationParser extends AbstractParser
                 }
 
                 // 多行参数 去掉换行符
-                $argsParts = \trim(\str_replace("\n", '', $matches[2][$index]));
-                $argsData = self::parseTagContent($argsParts);
+                //$argsParts = \trim(\str_replace("\n", '', $matches[2][$index]));
+                // $argsData = self::parseTagContent($matches[2][$index]);
+                $argsData = TagContentParser::handle($matches[2][$index]);
                 $annotations[] = [$name, $argsData];
             }
 
@@ -88,6 +93,9 @@ final class AnnotationParser extends AbstractParser
         return $annotations;
     }
 
+    const SINGLE_QUOTES = "'";
+    const DOUBLE_QUOTES = '"';
+
     /**
      * Parse individual annotation arguments
      * @param  string $content arguments string
@@ -96,12 +104,12 @@ final class AnnotationParser extends AbstractParser
      */
     public static function parseTagContent(string $content): array
     {
-        if (!$content) {
+        if (!$content = \trim($content)) {
             return [];
         }
 
         $data = [];
-        $len = \strlen($content);
+        $len = \mb_strlen($content);
         $i = 0;
         $var = $val = '';
         $level = 1;
@@ -111,14 +119,18 @@ final class AnnotationParser extends AbstractParser
         // $nextToken = '';
         $composing = $quoted = false;
         $delimiter = null;
-        $tokens = ['"', '"', '{', '}', ',', '='];
+        // $tokens = ['"', '"', '{', '}', ',', '='];
+        $tokens = self::TOKENS;
+
+        // $strList = preg_split('//u', $content, -1, \PREG_SPLIT_NO_EMPTY);
 
         while ($i < $len) {
             $c = $content[$i++] ?? '';
 
-            if ($c === '\'' || $c === '"') {
+            if ($c === self::SINGLE_QUOTES || $c === self::DOUBLE_QUOTES) {
                 $delimiter = $c;
-                //open delimiter
+
+                // open delimiter
                 if (!$composing && empty($prevDelimiter) && empty($nextDelimiter)) {
                     $prevDelimiter = $nextDelimiter = $delimiter;
                     $val = '';
@@ -138,7 +150,7 @@ final class AnnotationParser extends AbstractParser
                         if (',' !== $content[$i]) {
                             throw new \InvalidArgumentException(sprintf(
                                 'Parse Error: missing comma separator near: ...%s<--',
-                                \substr($content, $i - 10, $i)
+                                \mb_substr($content, $i - 10, $i)
                             ));
                         }
                     }
@@ -250,8 +262,6 @@ final class AnnotationParser extends AbstractParser
             } elseif (\is_numeric($val)) {
                 return $val + 0;
             }
-
-            unset($tmp);
         }
 
         return $val;
