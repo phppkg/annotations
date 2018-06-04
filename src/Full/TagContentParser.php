@@ -116,8 +116,7 @@ class TagContentParser
                 if (!$composing && !$prevDelimiter && !$nextDelimiter) {
                     $prevDelimiter = $nextDelimiter = $delimiter;
                     $val = '';
-                    $composing = true;
-                    $quoted = true;
+                    $composing = $quoted = true;
                 } else {
                     // close delimiter ' "
                     if ($char !== $nextDelimiter) {
@@ -135,6 +134,11 @@ class TagContentParser
                         if ('' === \trim($nextChar)) {
                             $i++;
                         } elseif (self::COMMA !== $nextChar) {
+                            // key 也用了 引号 {"id"="456"}
+                            if ($var !== '' && $nextChar === '=') {
+                                break;
+                            }
+
                             throw new \InvalidArgumentException(sprintf(
                                 'Parse Error: missing comma separator near(next %s): ...%s<--',
                                 $nextChar,
@@ -163,7 +167,7 @@ class TagContentParser
 
                         // If composing flag is true yet,
                         // it means that the string was not enclosed, so it is parsing error.
-                        if ($composing === true && !empty($prevDelimiter) && !empty($nextDelimiter)) {
+                        if ($composing === true && $prevDelimiter && $nextDelimiter) {
                             throw new \InvalidArgumentException(sprintf(
                                 'Parse Error: enclosing error -> expected: [%s], given: [%s]',
                                 $nextDelimiter, $char

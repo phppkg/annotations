@@ -109,4 +109,71 @@ class DocBlockHelper
 
         return $val;
     }
+
+    /**
+     * @notice 没有使用，仅是备份参考
+     * @param string $docBlock
+     * @return array
+     */
+    public static function parseToTagStrings(string $docBlock): array
+    {
+        $tagStrings = $matches = [];
+
+        // 当 tag 内部含有 右括号时，匹配出来会缺少后面的数据
+        \preg_match_all('/@([A-Za-z]\w+)\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches);
+
+        /** @var array[] $matches */
+        if ($matches) {
+            foreach ($matches[1] as $index => $name) {
+                // skip ignored
+                // if (isset(self::$ignoredTags[$name])) {
+                //     continue;
+                // }
+
+                if (!isset($matches[2][$index])) {
+                    continue;
+                }
+
+                $tagStrings[] = [$name, $matches[2][$index]];
+            }
+        }
+
+        return $tagStrings;
+    }
+
+    /**
+     * @param string $docBlock
+     * @return array
+     * [
+     *  ['tagName', 'tagContent'],
+     * ]
+     */
+    public static function parseToTagStrings2(string $docBlock): array
+    {
+        $tagStrings = $matches = [];
+
+        // 得到tag names
+        \preg_match_all('/@([A-Za-z]\w+)\(/', $docBlock, $matches);
+
+        /** @var array[] $matches */
+        if ($matches) {
+            // 得到tag的内容
+            $contents = \preg_split('/@[A-Za-z]\w+\(/', $docBlock, -1, \PREG_SPLIT_NO_EMPTY);
+            foreach ($matches[1] as $index => $name) {
+                // skip ignored
+                // if (isset(self::$ignoredTags[$name])) {
+                //     continue;
+                // }
+
+                if (!isset($contents[$index])) {
+                    continue;
+                }
+
+                $rightBrackets = \strrpos($contents[$index], ')');
+                $tagStrings[] = [$name, \trim(\substr($contents[$index], 0, $rightBrackets), '')];
+            }
+        }
+
+        return $tagStrings;
+    }
 }

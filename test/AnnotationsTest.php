@@ -1,4 +1,5 @@
 <?php
+
 namespace Ulue\Annotations\Test;
 
 use PHPUnit\Framework\TestCase;
@@ -54,66 +55,59 @@ class AnnotationsTest extends TestCase
      */
     public function testGetClassAnnotations($annotations)
     {
-        $result = $annotations->getClassAnnotations('User');
+        $result = $annotations->getClassAnnotations('User', true);
 
-        $expected = Array(
-            'Defaults' => Array(
-                0 => Array(
-                    'name' => 'user1',
-                    'lastname' => 'sample',
-                    'age' => 0,
-                    'address' => Array(
-                        'country' => 'USA',
-                        'state' => 'NY'
-                    ),
-                    'phone' => '000-00000000'
-                )
-            ),
-            'assertResult' => Array(
+        $expected = [
+            'Defaults' => [
+                'name' => 'user1',
+                'lastname' => 'sample',
+                'age' => 0,
+                'address' => [
+                    'country' => 'USA',
+                    'state' => 'NY'
+                ],
+                'phone' => '000-00000000'
+            ],
+            'assertResult' => [
                 0 => false
-            ),
-            'cache' => Array(
-                0 => Array(
-                    'collation' => 'UTF-8'
-                )
-            )
-        );
+            ],
+            'cache' => [
+                'collation' => 'UTF-8'
+            ]
+        ];
 
         $this->assertEquals($expected, $result);
     }
 
     /**
-     * @covers Annotations::getMethodAnnotations
+     * @covers  Annotations::getMethodAnnotations
      * @param Annotations $annotations
      * @depends testSetDefaultNamespace
      */
     public function testGetMethodAnnotations($annotations)
     {
-        $result = $annotations->getMethodAnnotations('User', 'load');
+        $result = $annotations->getMethodAnnotations('User', 'load', true);
 
-        $expected = Array(
-            'cache' => array(0 => true),
-            'type' => array(0 => 'json'),
-            'limits' => array(
-                0 => array(
-                    'start' => 10,
-                    'limit' => 50
-                )
-            )
-        );
+        $expected = [
+            'cache' => [0 => true],
+            'type' => [0 => 'json'],
+            'limits' => [
+                'start' => 10,
+                'limit' => 50
+            ]
+        ];
 
         $this->assertEquals($expected, $result);
     }
 
     /**
-     * @covers Annotations::getMethodAnnotationsObjects
+     * @covers  Annotations::getMethodAnnotationsObjects
      * @param Annotations $annotations
      * @depends testSetDefaultNamespace
      */
     public function testGetMethodAnnotationsObjects($annotations)
     {
-        $result = $annotations->getMethodAnnotationsObjects('User', 'create');
-        $expected = array();
+        $result = $annotations->getMethodAnnotationsObjects('User', 'create', true);
 
         $this->assertCount(2, $result);
         $this->assertArrayHasKey('Permission', $result);

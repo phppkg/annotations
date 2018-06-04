@@ -3,8 +3,6 @@
  * @author Somebody
  * @version 1.0
  *
- * @ChangeTrackingPolicy ("DEFERRED_IMPLICIT")
- * @ChangeTrackingPolicy("DEFERRED_EXPLICIT")
  * @ChangeTrackingPolicy("NOTIFY")
  * @InheritanceType("JOINED")
  * @DiscriminatorColumn( name="discr", type=" string " )

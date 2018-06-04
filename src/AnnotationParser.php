@@ -21,14 +21,34 @@ final class AnnotationParser extends AbstractParser
     /**
      * @param string $docBlock
      * @return array
+     * [
+     *  ['tagName', 'tagContent'],
+     * ]
      */
     public static function parseToTagStrings(string $docBlock): array
     {
-        $matches = [];
+        $tagStrings = $matches = [];
 
-        \preg_match_all('/@([A-Za-z]\w+)[\s\t]*\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches);
+        // bug： 当 tag 内部含有 右括号时，匹配出来会缺少后面的数据
+        \preg_match_all('/@([A-Za-z]\w+)\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches);
 
-        return $matches;
+        /** @var array[] $matches */
+        if ($matches) {
+            foreach ($matches[1] as $index => $name) {
+                // skip ignored
+                if (isset(self::$ignoredTags[$name])) {
+                    continue;
+                }
+
+                if (!isset($matches[2][$index])) {
+                    continue;
+                }
+
+                $tagStrings[] = [$name, $matches[2][$index]];
+            }
+        }
+
+        return $tagStrings;
     }
 
     /**
@@ -52,26 +72,17 @@ final class AnnotationParser extends AbstractParser
             return $annotations;
         }
 
-        /** @var array[] $matches */
-        if ($matches = self::parseToTagStrings($docBlock)) {
-            foreach ($matches[1] as $index => $name) {
-                // skip ignored
-                if (isset(self::$ignoredTags[$name])) {
-                    continue;
-                }
-
-                if (!isset($matches[2][$index])) {
-                    continue;
-                }
-
+        /** @var array $tagStrings */
+        if ($tagStrings = self::parseToTagStrings($docBlock)) {
+            foreach ($tagStrings as list($name, $content)) {
                 // 多行参数 去掉换行符
                 //$argsParts = \trim(\str_replace("\n", '', $matches[2][$index]));
                 // $argsData = self::parseTagContent($matches[2][$index]);
-                $argsData = TagContentParser::handle($matches[2][$index]);
+                $argsData = TagContentParser::handle($content);
                 $annotations[] = [$name, $argsData];
             }
 
-            unset($matches);
+            unset($tagStrings);
 
             // use tag name as index key
             if ($nameAsKey) {
