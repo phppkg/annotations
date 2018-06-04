@@ -42,7 +42,7 @@ DOC;
         $str = AnnotationParser::filterDocComment($docBlock);
         $this->assertNotContains('*', $str);
 
-        $tags = AnnotationParser::parseToTagStrings($str);
+        $tags = AnnotationParser::make()->parseToTagStrings($str);
 
         $this->assertArrayHasKey(1, $tags);
         $this->assertArrayHasKey(2, $tags);
@@ -81,7 +81,7 @@ DOC;
         $this->assertStringStartsWith('@Inject', $str);
         $this->assertStringEndsWith('})', $str);
 
-        $tags = AnnotationParser::parseToTagStrings($str);
+        $tags = AnnotationParser::make()->parseToTagStrings($str);
 
         $this->assertArrayHasKey(1, $tags);
         $this->assertArrayHasKey(2, $tags);

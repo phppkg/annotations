@@ -98,14 +98,68 @@ abstract class AbstractParser
     }
 
     /**
-     * Parse annotations
+     * Parse annotations/doc-block
      *
      * @param string $docBlock The doc block string.
      * @param bool $nameAsKey use tag name as index key.(NOTICE: repeat tag will override)
      * @return array parsed annotations data
      * @throws \InvalidArgumentException
      */
-    abstract public function parse(string $docBlock, bool $nameAsKey = false): array;
+    public function parse(string $docBlock, bool $nameAsKey = false): array
+    {
+        $annotations = [];
+
+        if (!$docBlock = trim($docBlock, '/')) {
+            return $annotations;
+        }
+
+        // 去除所有的 * 符号
+        if (!$docBlock = self::filterDocComment($docBlock)) {
+            return $annotations;
+        }
+
+        /** @var array $tagStrings */
+        if ($tagStrings = $this->parseToTagStrings($docBlock)) {
+            foreach ($tagStrings as list($name, $content)) {
+                $annotations[] = [$name, $this->parseTagContent($content)];
+            }
+
+            unset($tagStrings);
+
+            // use tag name as index key
+            if ($nameAsKey) {
+                $tagMap = [];
+
+                foreach ($annotations as list($name, $data)) {
+                    if (isset(self::$allowMultiTags[$name])) {
+                        $tagMap[$name][] = $data;
+                    } else {
+                        $tagMap[$name] = $data;
+                    }
+                }
+
+                unset($annotations);
+                return $tagMap;
+            }
+        }
+
+        return $annotations;
+    }
+    /**
+     * @param string $docBlock
+     * @return array
+     * [
+     *  ['tagName', 'tagContent'],
+     * ]
+     */
+    abstract public function parseToTagStrings(string $docBlock): array;
+
+    /**
+     * @param string $content Tag content
+     * @param string $tag Tag name
+     * @return array
+     */
+    abstract public function parseTagContent(string $content, string $tag): array;
 
     /*************************************************************************************
      * getter/setter methods

@@ -30,7 +30,7 @@ require dirname(__DIR__) . '/test/boot.php';
 $str = \Ulue\Annotations\AnnotationParser::filterDocComment($str);
 
 // parse to string list
-$arr = \Ulue\Annotations\AnnotationParser::parseToTagStrings($str);
+$arr = \Ulue\Annotations\AnnotationParser::make()->parseToTagStrings($str);
 
 $data = \Ulue\Annotations\Full\TagContentParser::handle($arr[2][0]);
 
