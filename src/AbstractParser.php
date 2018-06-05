@@ -121,7 +121,7 @@ abstract class AbstractParser
         /** @var array $tagStrings */
         if ($tagStrings = $this->parseToTagStrings($docBlock)) {
             foreach ($tagStrings as list($name, $content)) {
-                $annotations[] = [$name, $this->parseTagContent($content)];
+                $annotations[] = [$name, $this->parseTagContent($content, $name)];
             }
 
             unset($tagStrings);

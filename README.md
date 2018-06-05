@@ -250,7 +250,7 @@ phpunit
 
 ```php
 /**
- * @Route(route="{alias}", method="GET", params={"alias"="[a-zA-Z][\\w-]+(?:.html)?"})
+ * @Route(path="{alias}", method="GET", params={"alias"="[a-zA-Z][\\w-]+(?:.html)?"})
  */
  
  // 取不到 )?"})

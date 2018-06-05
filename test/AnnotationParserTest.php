@@ -72,8 +72,8 @@ DOC;
  * @Response(type=json)
  * @Apostrophe(type='json')
  * @DoubleQuotes(type="value2")
- * @Route(route="{id}", method="GET", params={"id"="[1-9]\d*"})
- * @Route(route="{alias}", method="GET", params={"alias"="[a-zA-Z][\w-]+(?:.html)?"})
+ * @Route(path="{id}", method="GET", params={"id"="[1-9]\d*"})
+ * @Route(path="{alias}", method="GET", params={"alias"="[a-zA-Z][\w-]+(?:.html)?"})
  */
 DOC;
         $str = AnnotationParser::filterDocComment($docBlock);
