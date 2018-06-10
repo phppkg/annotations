@@ -178,7 +178,7 @@ class TagContentParser
                         break;
                     case '{': // start a sub content
                         $type = self::TYPE_ARR;
-                        $subContent = '';
+                        $subContent = $subDelimiter = '';
                         $subComposing = true;
 
                         while ($i <= $len) {
@@ -191,8 +191,13 @@ class TagContentParser
                                 ));
                             }
 
+                            // eg 'params={ym="[2-9]\d{5}"}' -> sub-content should be: ym="[2-9]\d{5}"
+                            if ($char === self::SINGLE_QUOTES || $char === self::DOUBLE_QUOTES) {
+                                $subDelimiter = $subDelimiter ? '' : $char;
+                            }
+
                             // end sub content
-                            if ($char === '}') {
+                            if ($char === '}' && !$subDelimiter) {
                                 $subComposing = false;
                                 break;
                             }

@@ -181,5 +181,12 @@ class TagContentParserTest extends TestCase
 
         $data = TagContentParser::handle('methods={"GET", "POST"}');
         $this->assertCount(1, $data);
+
+        $data = TagContentParser::handle('method="GET", params={ym="[2-9]\d{5}"}');
+        $this->assertCount(2, $data);
+        $this->assertArrayHasKey('method', $data);
+        $this->assertArrayHasKey('params', $data);
+        $this->assertArrayHasKey('ym', $data['params']);
+        $this->assertSame('[2-9]\d{5}', $data['params']['ym']);
     }
 }

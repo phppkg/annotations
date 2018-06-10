@@ -13,5 +13,8 @@ require dirname(__DIR__) . '/test/boot.php';
 // $data = \Ulue\Annotations\Full\TagContentParser::handle('val, k=val1, val2, val3');
 // $data = \Ulue\Annotations\Full\TagContentParser::handle('"id"="[1-9]\d*"');
 // $data = \Ulue\Annotations\Full\TagContentParser::handle('"alias"="[a-zA-Z][\w-]+(?:.html)?"');
-$data = \Ulue\Annotations\Full\TagContentParser::handle('route="{alias}", method="GET", params={"alias"="[a-zA-Z][\w-]+(?:.html)?"}');
+// $data = \Ulue\Annotations\Full\TagContentParser::handle('route="{alias}", method="GET", params={"alias"="[a-zA-Z][\w-]+(?:.html)?"}');
+//  * @Route(path="/blog/archive/{ym}", method="GET", params={ym="[2-9]\d{5}"})
+
+$data = \Ulue\Annotations\Full\TagContentParser::handle('method="GET", params={ym="[2-9]\d{5}"}');
 \var_dump($data);
