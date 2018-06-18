@@ -299,6 +299,16 @@ final class Annotations
      * @return \ReflectionClass
      * @throws \ReflectionException
      */
+    public static function getReflection(string $class): \ReflectionClass
+    {
+        return self::createReflection($class);
+    }
+    
+    /**
+     * @param string $class
+     * @return \ReflectionClass
+     * @throws \ReflectionException
+     */
     public static function createReflection(string $class): \ReflectionClass
     {
         if (!isset(self::$reflections[$class])) {
