@@ -109,7 +109,7 @@ abstract class AbstractParser
     {
         $annotations = [];
 
-        if (!$docBlock = trim($docBlock, '/')) {
+        if (!$docBlock = \trim($docBlock, '/')) {
             return $annotations;
         }
 
