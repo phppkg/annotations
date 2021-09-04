@@ -6,14 +6,14 @@ Simple and Lightweight PHP Class & Methods Annotations Reader
 
 ## 项目地址
 
-- **github** https://github.com/ulue/Annotations.git
+- **github** https://github.com/phpcom-lab/annotations.git
 
 ## 安装
 
 - composer 命令
 
 ```php
-composer require ulue/annotations
+composer require phpcom-lab/annotations
 ```
 
 - composer.json
@@ -21,7 +21,7 @@ composer require ulue/annotations
 ```json
 {
     "require": {
-        "ulue/annotations": "dev-master"
+        "phpcom-lab/annotations": "dev-master"
     }
 }
 ```
@@ -29,7 +29,7 @@ composer require ulue/annotations
 - 直接拉取
 
 ```bash
-git clone https://github.com/ulue/Annotations.git // github
+git clone https://github.com/phpcom-lab/annotations.git // github
 ```
 
 ## 使用
