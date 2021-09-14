@@ -32,8 +32,10 @@ final class AnnotationParser extends AbstractParser
 
         // bug：当 tag 内部含有 右括号时，匹配出来会缺少后面的数据
         // m - 多行支持
-        preg_match_all('/@([A-Za-z]\w+)\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches);
-        // preg_match_all('/@([A-Za-z]\w+)\((.*)\)[\s\t]*\r?/m', $docBlock, $matches);
+        // preg_match_all('/@([A-Za-z]\w+)\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches);
+        // preg_match_all('/@([A-Za-z]\w+)\(([\s.]*)\)[\s\t]*\r?/m', $docBlock, $matches);
+        // preg_match_all('/@([A-Za-z]\w+)\(([\s\S]+)\)[\s\t]*\r?/m', $docBlock, $matches);
+        preg_match_all('/@([A-Za-z]\w+)\(([^@]*)\)[\s\t]*\r?/m', $docBlock, $matches);
 
         /** @var array[] $matches */
         if ($matches) {
