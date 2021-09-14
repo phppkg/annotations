@@ -27,6 +27,6 @@ $text = <<<DOC
  */
 DOC;
 
-$ret = \Ulue\Annotations\AnnotationParser::make()->parse($text);
+$ret = \PhpComLab\Annotations\AnnotationParser::make()->parse($text);
 
 var_dump($ret);

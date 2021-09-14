@@ -6,11 +6,11 @@
  * Time: 16:46
  */
 
-namespace Ulue\Annotations;
+namespace PhpComLab\Annotations;
 
 /**
  * Class AnnotationObject
- * @package Ulue\Annotations
+ * @package PhpComLab\Annotations
  */
 class AnnotationObject
 {

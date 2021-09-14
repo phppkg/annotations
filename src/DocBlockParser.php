@@ -6,11 +6,18 @@
  * Time: 12:16
  */
 
-namespace Ulue\Annotations;
+namespace PhpComLab\Annotations;
+
+use function preg_match;
+use function preg_replace;
+use function preg_split;
+use function str_replace;
+use function trim;
 
 /**
  * Class DocBlockParser
- * @package Ulue\Annotations
+ *
+ * @package PhpComLab\Annotations
  */
 class DocBlockParser extends AbstractParser
 {
@@ -36,11 +43,12 @@ class DocBlockParser extends AbstractParser
         }
 
         $tagStrings = [];
-        $comments = "@{$this->defaultTag} {$filtered}";
-        $tagParts = \preg_split('/^\s*@/m', $comments, -1, PREG_SPLIT_NO_EMPTY);
+        $defaultTag = $this->defaultTag;
+        $comments = "@$defaultTag $filtered";
+        $tagParts = preg_split('/^\s*@/m', $comments, -1, PREG_SPLIT_NO_EMPTY);
 
         foreach ($tagParts as $part) {
-            if (\preg_match('/^(\w+)(.*)/ms', \trim($part), $matches)) {
+            if (preg_match('/^(\w+)(.*)/ms', trim($part), $matches)) {
                 $name = $matches[1];
 
                 // skip ignored
@@ -48,7 +56,7 @@ class DocBlockParser extends AbstractParser
                     continue;
                 }
 
-                $tagStrings[] = [$name, \trim($matches[2])];
+                $tagStrings[] = [$name, trim($matches[2])];
             }
         }
 
@@ -95,10 +103,14 @@ class DocBlockParser extends AbstractParser
      */
     public static function description(string $comments): string
     {
-        $comments = \str_replace("\r", '', \trim(\preg_replace('/^\s*\**( |\t)?/m', '', trim($comments, '/'))));
+        $comments = str_replace(
+            "\r",
+            '',
+            trim(preg_replace('/^\s*\**( |\t)?/m', '', trim($comments, '/')))
+        );
 
-        if (\preg_match('/^\s*@\w+/m', $comments, $matches, PREG_OFFSET_CAPTURE)) {
-            $comments = \trim(substr($comments, 0, $matches[0][1]));
+        if (preg_match('/^\s*@\w+/m', $comments, $matches, PREG_OFFSET_CAPTURE)) {
+            $comments = trim(substr($comments, 0, $matches[0][1]));
         }
 
         return $comments;
@@ -115,7 +127,7 @@ class DocBlockParser extends AbstractParser
     /**
      * @param callable $tagContentParser
      */
-    public function setTagContentParser(callable $tagContentParser)
+    public function setTagContentParser(callable $tagContentParser): void
     {
         $this->tagContentParser = $tagContentParser;
     }

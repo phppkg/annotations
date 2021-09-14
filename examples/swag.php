@@ -27,15 +27,15 @@ DOC;
 require dirname(__DIR__) . '/test/boot.php';
 
 // clear char *
-$str = \Ulue\Annotations\AnnotationParser::filterDocComment($str);
+$str = \PhpComLab\Annotations\AnnotationParser::filterDocComment($str);
 
 // parse to string list
-$arr = \Ulue\Annotations\AnnotationParser::make()->parseToTagStrings($str);
+$arr = \PhpComLab\Annotations\AnnotationParser::make()->parseToTagStrings($str);
 
-$data = \Ulue\Annotations\Full\TagContentParser::handle($arr[2][0]);
+$data = \PhpComLab\Annotations\Full\TagContentParser::handle($arr[2][0]);
 
 var_dump($data);
 
-$data = \Ulue\Annotations\Full\TagContentParser::handle($arr[2][1]);
+$data = \PhpComLab\Annotations\Full\TagContentParser::handle($arr[2][1]);
 
 var_dump($data);

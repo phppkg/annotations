@@ -6,11 +6,18 @@
  * Time: 14:44
  */
 
-namespace Ulue\Annotations;
+namespace PhpComLab\Annotations;
+
+use InvalidArgumentException;
+use function preg_replace;
+use function str_replace;
+use function trim;
+use function vdump;
 
 /**
  * Class AbstractParser
- * @package Ulue\Annotations
+ *
+ * @package PhpComLab\Annotations
  */
 abstract class AbstractParser
 {
@@ -18,51 +25,52 @@ abstract class AbstractParser
      * @var array
      */
     protected static $ignoredTags = [
-        'Annotation' => 1,
-        'abstract' => 1,
-        'access' => 1,
-        'api' => 1,
-        'author' => 1,
-        'category' => 1,
-        'copyright' => 1,
+        'Annotation'              => 1,
+        'abstract'                => 1,
+        'access'                  => 1,
+        'api'                     => 1,
+        'author'                  => 1,
+        'category'                => 1,
+        'copyright'               => 1,
         'codeCoverageIgnoreStart' => 1,
-        'codeCoverageIgnoreEnd' => 1,
-        'deprecated' => 1,
-        'email' => 1,
-        'example' => 1,
-        'exception' => 1,
-        'final' => 1,
-        'filesource' => 1,
-        'global' => 1,
-        'ignore' => 1,
-        'inheritdoc' => 1,
-        'internal' => 1,
-        'license' => 1,
-        'link' => 1,
-        'magic' => 1,
-        'method' => 1,
-        'name' => 1,
-        'override' => 1,
-        'package' => 1,
-        'param' => 1,
-        'private' => 1,
-        'property' => 1,
-        'return' => 1,
-        'see' => 1,
-        'since' => 1,
-        'static' => 1,
-        'subpackage' => 1,
-        'throws' => 1,
-        'throw' => 1,
-        'todo' => 1,
-        'tutorial' => 1,
-        'uses' => 1,
-        'version' => 1,
+        'codeCoverageIgnoreEnd'   => 1,
+        'deprecated'              => 1,
+        'email'                   => 1,
+        'example'                 => 1,
+        'exception'               => 1,
+        'final'                   => 1,
+        'filesource'              => 1,
+        'global'                  => 1,
+        'ignore'                  => 1,
+        'inheritdoc'              => 1,
+        'internal'                => 1,
+        'license'                 => 1,
+        'link'                    => 1,
+        'magic'                   => 1,
+        'method'                  => 1,
+        'name'                    => 1,
+        'override'                => 1,
+        'package'                 => 1,
+        'param'                   => 1,
+        'private'                 => 1,
+        'property'                => 1,
+        'return'                  => 1,
+        'see'                     => 1,
+        'since'                   => 1,
+        'static'                  => 1,
+        'subpackage'              => 1,
+        'throws'                  => 1,
+        'throw'                   => 1,
+        'todo'                    => 1,
+        'tutorial'                => 1,
+        'uses'                    => 1,
+        'version'                 => 1,
     ];
 
     /**
-     * @var array
      * [tag name => 1]
+     *
+     * @var array
      */
     protected static $allowMultiTags = [];
 
@@ -81,20 +89,21 @@ abstract class AbstractParser
      * second line, this is description ...
      *
      * @param string $docBlock
+     *
      * @return string
      */
     public static function filterDocComment(string $docBlock): string
     {
-        $docBlock = \str_replace("\r\n", "\n", \trim($docBlock, "/ \n"));
+        $docBlock = str_replace("\r\n", "\n", trim($docBlock, "/ \n"));
 
         // 去除所有的 * 符号
-        $filtered = (string)\str_replace("\r", '',
-            \trim(\preg_replace('/^\s*\**( |\t)?/m', '', $docBlock))
+        $filtered = (string)str_replace("\r", '',
+            trim(preg_replace('/^\s*\**( |\t)?/m', '', $docBlock))
         );
 
-        $filtered = \trim($filtered, '/* ');
+        $filtered = trim($filtered, '/* ');
 
-        return \trim($filtered);
+        return trim($filtered);
     }
 
     /**
@@ -102,14 +111,14 @@ abstract class AbstractParser
      *
      * @param string $docBlock The doc block string.
      * @param bool $nameAsKey use tag name as index key.(NOTICE: repeat tag will override)
+     *
      * @return array parsed annotations data
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function parse(string $docBlock, bool $nameAsKey = false): array
     {
         $annotations = [];
-
-        if (!$docBlock = \trim($docBlock, '/')) {
+        if (!$docBlock = trim($docBlock, '/')) {
             return $annotations;
         }
 
@@ -118,19 +127,16 @@ abstract class AbstractParser
             return $annotations;
         }
 
-        /** @var array $tagStrings */
         if ($tagStrings = $this->parseToTagStrings($docBlock)) {
-            foreach ($tagStrings as list($name, $content)) {
+            foreach ($tagStrings as [$name, $content]) {
                 $annotations[] = [$name, $this->parseTagContent($content, $name)];
             }
-
             unset($tagStrings);
 
             // use tag name as index key
             if ($nameAsKey) {
                 $tagMap = [];
-
-                foreach ($annotations as list($name, $data)) {
+                foreach ($annotations as [$name, $data]) {
                     if (isset(self::$allowMultiTags[$name])) {
                         $tagMap[$name][] = $data;
                     } else {
@@ -145,8 +151,10 @@ abstract class AbstractParser
 
         return $annotations;
     }
+
     /**
      * @param string $docBlock
+     *
      * @return array
      * [
      *  ['tagName', 'tagContent'],
@@ -157,6 +165,7 @@ abstract class AbstractParser
     /**
      * @param string $content Tag content
      * @param string $tag Tag name
+     *
      * @return array
      */
     abstract public function parseTagContent(string $content, string $tag): array;
@@ -176,7 +185,7 @@ abstract class AbstractParser
     /**
      * @param string[] $ignoredTags
      */
-    public static function setIgnoredTags(array $ignoredTags)
+    public static function setIgnoredTags(array $ignoredTags): void
     {
         foreach ($ignoredTags as $tag) {
             self::$ignoredTags[$tag] = 1;
@@ -186,7 +195,7 @@ abstract class AbstractParser
     /**
      * @param string[]|string $tagNames
      */
-    public static function notIgnoreTags($tagNames)
+    public static function notIgnoreTags($tagNames): void
     {
         foreach ((array)$tagNames as $tag) {
             if (isset(self::$ignoredTags[$tag])) {
@@ -198,7 +207,7 @@ abstract class AbstractParser
     /**
      * @param array $ignoredTags
      */
-    public static function addIgnoredTags(array $ignoredTags)
+    public static function addIgnoredTags(array $ignoredTags): void
     {
         self::setIgnoredTags($ignoredTags);
     }
@@ -206,7 +215,7 @@ abstract class AbstractParser
     /**
      * @param string $name
      */
-    public static function addIgnoredTag(string $name)
+    public static function addIgnoredTag(string $name): void
     {
         self::$ignoredTags[$name] = 1;
     }
@@ -222,7 +231,7 @@ abstract class AbstractParser
     /**
      * @param array $allowMultiTags
      */
-    public static function setAllowMultiTags(array $allowMultiTags)
+    public static function setAllowMultiTags(array $allowMultiTags): void
     {
         foreach ($allowMultiTags as $tag) {
             self::$allowMultiTags[$tag] = 1;

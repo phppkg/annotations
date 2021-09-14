@@ -6,7 +6,16 @@
  * Time: 16:46
  */
 
-namespace Ulue\Annotations;
+namespace PhpComLab\Annotations;
+
+use InvalidArgumentException;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
+use RuntimeException;
+use Toolkit\Stdlib\Obj\ObjectHelper;
+use function class_exists;
+use function ucfirst;
 
 /**
  * Class Annotations
@@ -24,18 +33,21 @@ final class Annotations
 {
     /**
      * Static array to store already parsed annotations
+     *
      * @var array
      */
     private static $_annotations;
 
     /**
      * cached class reflections
-     * @var \ReflectionClass[]
+     *
+     * @var ReflectionClass[]
      */
     private static $reflections = [];
 
     /**
      * You can set the tag class map
+     *
      * @var array
      * [
      *  tag name => full class
@@ -45,6 +57,7 @@ final class Annotations
 
     /**
      * Indicates that annotations should has strict behavior, 'false' by default
+     *
      * @var boolean
      */
     private $strict = false;
@@ -56,6 +69,7 @@ final class Annotations
 
     /**
      * Stores the default namespace for Objects instance, usually used on methods like getMethodAnnotationsObjects()
+     *
      * @var string e.g '\Annotation\\'
      */
     private $defaultNamespace = '';
@@ -68,6 +82,7 @@ final class Annotations
     /**
      * @param array $config
      * @param AnnotationParser|null $parser
+     *
      * @return Annotations
      */
     public static function make(array $config = [], AnnotationParser $parser = null): Annotations
@@ -77,22 +92,20 @@ final class Annotations
 
     /**
      * Annotations constructor.
+     *
      * @param array $config
      * @param AnnotationParser|null $parser
      */
     public function __construct(array $config = [], AnnotationParser $parser = null)
     {
-        foreach ($config as $name => $value) {
-            if (\method_exists($this, $setter = 'set' . \ucfirst($name))) {
-                $this->$setter($value);
-            }
-        }
+        ObjectHelper::init($this, $config);
 
         $this->parser = $parser ?: new AnnotationParser();
     }
 
     /**
      * Sets strict variable to true/false
+     *
      * @param bool $value boolean value to indicate that annotations to has strict behavior
      */
     public function setStrict($value)
@@ -102,6 +115,7 @@ final class Annotations
 
     /**
      * Sets default namespace to use in object instantiation
+     *
      * @param string $namespace default namespace
      */
     public function setDefaultNamespace(string $namespace)
@@ -111,6 +125,7 @@ final class Annotations
 
     /**
      * Gets default namespace used in object instantiation
+     *
      * @return string $namespace default namespace
      */
     public function getDefaultAnnotationNamespace(): string
@@ -121,18 +136,19 @@ final class Annotations
     /**
      * Gets all annotations with pattern @SomeAnnotation() from a given class
      *
-     * @param  string $className class name to get annotations
-     * @param  bool $nameAsKey use tag name as annotations data key
+     * @param string $className class name to get annotations
+     * @param bool $nameAsKey use tag name as annotations data key
+     *
      * @return array  self::$_annotations all annotated elements
-     * @throws \InvalidArgumentException
-     * @throws \ReflectionException
+     * @throws InvalidArgumentException
+     * @throws ReflectionException
      */
     public function getClassAnnotations(string $className, bool $nameAsKey = false): array
     {
         $key = $className . '.class';
 
         if (!isset(self::$_annotations[$key])) {
-            $class = self::createReflection($className);
+            $class                    = self::createReflection($className);
             self::$_annotations[$key] = $this->parser->parse($class->getDocComment(), $nameAsKey);
         }
 
@@ -142,9 +158,10 @@ final class Annotations
     /**
      * Gets all annotations with pattern @SomeAnnotation() from a determinated method of a given class
      *
-     * @param  string $className class name
-     * @param  string $methodName method name to get annotations
-     * @param  bool $nameAsKey
+     * @param string $className class name
+     * @param string $methodName method name to get annotations
+     * @param bool $nameAsKey
+     *
      * @return array[]  self::$_annotations all annotated elements of a method given
      *
      * $useNameAsKey is true
@@ -160,7 +177,7 @@ final class Annotations
      *  ]
      * ]
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getMethodAnnotations(string $className, string $methodName, bool $nameAsKey = false): array
     {
@@ -168,9 +185,9 @@ final class Annotations
 
         if (!isset(self::$_annotations[$prefix][$methodName])) {
             try {
-                $method = new \ReflectionMethod($className, $methodName);
+                $method      = new ReflectionMethod($className, $methodName);
                 $annotations = $this->parser->parse($method->getDocComment(), $nameAsKey);
-            } catch (\ReflectionException $e) {
+            } catch (ReflectionException $e) {
                 $annotations = [];
             }
 
@@ -183,10 +200,11 @@ final class Annotations
     /**
      * @param string $className
      * @param int $filter Filter methods, default return all.
-     * @param  bool $nameAsKey use tag name as annotations data key
+     * @param bool $nameAsKey use tag name as annotations data key
+     *
      * @return array
-     * @throws \InvalidArgumentException
-     * @throws \ReflectionException
+     * @throws InvalidArgumentException
+     * @throws ReflectionException
      * @see \ReflectionMethod for filter flags
      * like:
      * - ReflectionMethod::IS_STATIC
@@ -195,9 +213,9 @@ final class Annotations
      */
     public function getMethodsAnnotations(string $className, int $filter = -1, bool $nameAsKey = false): array
     {
-        $ref = self::createReflection($className);
+        $ref    = self::createReflection($className);
         $prefix = $className . '.methods';
-        $map = [];
+        $map    = [];
 
         foreach ($ref->getMethods($filter) as $refMethod) {
             $methodName = $refMethod->getName();
@@ -217,11 +235,12 @@ final class Annotations
     /**
      * @param string $className
      * @param int $filter Filter methods, default return all.
-     * @param  bool $nameAsKey use tag name as annotations data key
+     * @param bool $nameAsKey use tag name as annotations data key
+     *
      * @return \Generator
-     * @throws \InvalidArgumentException
-     * @throws \ReflectionException
-     * @see \ReflectionMethod for filter flags
+     * @throws InvalidArgumentException
+     * @throws ReflectionException
+     * @see ReflectionMethod for filter flags
      * like:
      * - ReflectionMethod::IS_STATIC
      * - ReflectionMethod::IS_PUBLIC
@@ -229,7 +248,7 @@ final class Annotations
      */
     public function yieldMethodsAnnotations(string $className, int $filter = -1, bool $nameAsKey = false)
     {
-        $ref = new \ReflectionClass($className);
+        $ref    = new ReflectionClass($className);
         $prefix = $className . '.methods';
 
         foreach ($ref->getMethods($filter) as $refMethod) {
@@ -249,31 +268,32 @@ final class Annotations
      * Gets all annotations with pattern @SomeAnnotation() from a determinated method of a given class
      * and instance its abcAnnotation class
      *
-     * @param  string $className class name
-     * @param  string $methodName method name to get annotations
-     * @param  bool $nameAsKey use tag name as annotations data key
+     * @param string $className class name
+     * @param string $methodName method name to get annotations
+     * @param bool $nameAsKey use tag name as annotations data key
+     *
      * @return array  self::$_annotations all annotated objects of a method given
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     public function getMethodAnnotationsObjects(string $className, string $methodName, bool $nameAsKey = false): array
     {
-        $objects = [];
+        $objects     = [];
         $annotations = $this->getMethodAnnotations($className, $methodName);
 
         //
-        foreach ($annotations as list($name, $data)) {
+        foreach ($annotations as [$name, $data]) {
             if (isset(self::$tagClasses[$name])) {
                 $class = self::$tagClasses[$name];
             } else {
-                $class = $this->defaultNamespace . \ucfirst($name) . $this->tagClassSuffix;
+                $class = $this->defaultNamespace . ucfirst($name) . $this->tagClassSuffix;
             }
 
             // verify is the annotation class exists, depending if Annotations::strict is true
             // if not, just skip the annotation instance creation.
-            if (!\class_exists($class)) {
+            if (!class_exists($class)) {
                 if ($this->strict) {
-                    throw new \RuntimeException(sprintf(
+                    throw new RuntimeException(sprintf(
                         'Annotation Class Not Found: %s for the tag: %s',
                         $class,
                         $name
@@ -296,23 +316,25 @@ final class Annotations
 
     /**
      * @param string $class
-     * @return \ReflectionClass
-     * @throws \ReflectionException
+     *
+     * @return ReflectionClass
+     * @throws ReflectionException
      */
-    public static function getReflection(string $class): \ReflectionClass
+    public static function getReflection(string $class): ReflectionClass
     {
         return self::createReflection($class);
     }
-    
+
     /**
      * @param string $class
-     * @return \ReflectionClass
-     * @throws \ReflectionException
+     *
+     * @return ReflectionClass
+     * @throws ReflectionException
      */
-    public static function createReflection(string $class): \ReflectionClass
+    public static function createReflection(string $class): ReflectionClass
     {
         if (!isset(self::$reflections[$class])) {
-            self::$reflections[$class] = new \ReflectionClass($class);
+            self::$reflections[$class] = new ReflectionClass($class);
         }
 
         return self::$reflections[$class];

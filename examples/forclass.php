@@ -6,13 +6,14 @@
  * Time: 18:43
  */
 
-use Ulue\Annotations\Annotations;
+use PhpComLab\Annotations\Annotations;
 
 require dirname(__DIR__) . '/test/boot.php';
 
 $an = Annotations::make([
     'nameAsKey' => true,
 ]);
+
 // var_dump($an);die;
 $ret = $an->yieldMethodsAnnotations(\User::class);
 

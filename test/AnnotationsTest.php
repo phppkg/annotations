@@ -1,9 +1,9 @@
 <?php
 
-namespace Ulue\Annotations\Test;
+namespace PhpComLab\Annotations\Test;
 
 use PHPUnit\Framework\TestCase;
-use Ulue\Annotations\Annotations;
+use PhpComLab\Annotations\Annotations;
 use Base\Annotation\PermissionAnnotation;
 use Base\Annotation\RoleAnnotation;
 
@@ -21,7 +21,7 @@ class AnnotationsTest extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->annotations = new Annotations;
     }
@@ -30,7 +30,7 @@ class AnnotationsTest extends TestCase
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
     }
 

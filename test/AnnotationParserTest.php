@@ -6,19 +6,20 @@
  * Time: 11:23
  */
 
-namespace Ulue\Annotations\Test;
+namespace PhpComLab\Annotations\Test;
 
 use PHPUnit\Framework\TestCase;
-use Ulue\Annotations\AnnotationParser;
+use PhpComLab\Annotations\AnnotationParser;
+use function vdump;
 
 /**
  * Class AnnotationParserTest
- * @package Ulue\Annotations\Test
- * @covers \Ulue\Annotations\AnnotationParser
+ * @package PhpComLab\Annotations\Test
+ * @covers \PhpComLab\Annotations\AnnotationParser
  */
 class AnnotationParserTest extends TestCase
 {
-    public function testFilterAndParseDocComment1()
+    public function testFilterAndParseDocComment1(): void
     {
         $docBlock = <<<DOC
 /**
@@ -40,7 +41,7 @@ class AnnotationParserTest extends TestCase
 DOC;
 
         $str = AnnotationParser::filterDocComment($docBlock);
-        $this->assertNotContains('*', $str);
+        $this->assertStringNotContainsString('*', $str);
 
         $tags = AnnotationParser::make()->parseToTagStrings($str);
 
@@ -53,7 +54,7 @@ DOC;
         $this->assertEquals('tag1', $tags[1][0]);
     }
 
-    public function testFilterAndParseDocComment2()
+    public function testFilterAndParseDocComment_hasLeftBrackets(): void
     {
         $docBlock = <<<DOC
 /**
@@ -72,17 +73,24 @@ DOC;
  * @Response(type=json)
  * @Apostrophe(type='json')
  * @DoubleQuotes(type="value2")
- * @Route(path="{id}", method="GET", params={"id"="[1-9]\d*"})
+ * // 内部含有 括号
  * @Route(path="{alias}", method="GET", params={"alias"="[a-zA-Z][\w-]+(?:.html)?"})
+ * @Route(path="{alias}",
+ *  method="GET",
+ *  params={"alias"="[a-zA-Z][\w-]+(?:.html)?"}
+ * )
+ * @Route(path="{id}", method="GET", params={"id"="[1-9]\d*"})
  */
 DOC;
         $str = AnnotationParser::filterDocComment($docBlock);
 
         $this->assertStringStartsWith('@Inject', $str);
         $this->assertStringEndsWith('})', $str);
+        $this->assertStringNotContainsString(' *', $str);
 
         $tags = AnnotationParser::make()->parseToTagStrings($str);
 
+vdump($tags);
         $this->assertArrayHasKey(1, $tags);
         $this->assertArrayHasKey(2, $tags);
 

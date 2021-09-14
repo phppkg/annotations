@@ -6,11 +6,22 @@
  * Time: 11:59
  */
 
-namespace Ulue\Annotations;
+namespace PhpComLab\Annotations;
+
+use function is_array;
+use function is_numeric;
+use function is_string;
+use function mb_strlen;
+use function mb_substr;
+use function preg_match_all;
+use function preg_split;
+use function strtolower;
+use function trim;
 
 /**
  * Class DocBlockHelper
- * @package Ulue\Annotations
+ *
+ * @package PhpComLab\Annotations
  */
 class DocBlockHelper
 {
@@ -22,10 +33,10 @@ class DocBlockHelper
     {
         $start = 0;
         $encoding = 'UTF-8';
-        $length = \mb_strlen($string, $encoding);
+        $length = mb_strlen($string, $encoding);
 
         while ($start < $length) {
-            $char = \mb_substr($string, $start, 1, $encoding);
+            $char = mb_substr($string, $start, 1, $encoding);
             $start++;
             yield $char;
         }
@@ -40,10 +51,10 @@ class DocBlockHelper
         $start = 0;
         $array = [];
         $encoding = 'UTF-8';
-        $length = \mb_strlen($string, $encoding);
+        $length = mb_strlen($string, $encoding);
 
         while ($start < $length) {
-            $char = \mb_substr($string, $start, 1, $encoding);
+            $char = mb_substr($string, $start, 1, $encoding);
 
             $start++;
             $array[] = $char;
@@ -61,9 +72,9 @@ class DocBlockHelper
         $array = [];
         $encoding = 'UTF-8';
 
-        while ($strlen = \mb_strlen($string, $encoding)) {
-            $array[] = \mb_substr($string, 0, 1, $encoding);
-            $string = \mb_substr($string, 1, $strlen, $encoding);
+        while ($strlen = mb_strlen($string, $encoding)) {
+            $array[] = mb_substr($string, 0, 1, $encoding);
+            $string = mb_substr($string, 1, $strlen, $encoding);
         }
 
         return $array;
@@ -77,7 +88,7 @@ class DocBlockHelper
      */
     public static function strToArray2(string $string): array
     {
-        return \preg_split('//u', $string, -1, \PREG_SPLIT_NO_EMPTY);
+        return preg_split('//u', $string, -1, \PREG_SPLIT_NO_EMPTY);
     }
 
     /**
@@ -87,22 +98,22 @@ class DocBlockHelper
      * @param  boolean $trim indicate if the value passed should be trimmed after to try cast
      * @return mixed         returns the value converted to original type if was possible
      */
-    public static function castValue($val, $trim = false)
+    public static function castValue($val, bool $trim = false)
     {
-        if (\is_array($val)) {
+        if (is_array($val)) {
             foreach ($val as $key => $value) {
                 $val[$key] = self::castValue($value);
             }
-        } elseif (\is_string($val)) {
+        } elseif (is_string($val)) {
             if ($trim) {
-                $val = \trim($val);
+                $val = trim($val);
             }
 
-            $tmp = \strtolower($val);
+            $tmp = strtolower($val);
 
             if ($tmp === 'false' || $tmp === 'true') {
                 $val = $tmp === 'true';
-            } elseif (\is_numeric($val)) {
+            } elseif (is_numeric($val)) {
                 return $val + 0;
             }
         }
@@ -120,7 +131,7 @@ class DocBlockHelper
         $tagStrings = $matches = [];
 
         // 当 tag 内部含有 右括号时，匹配出来会缺少后面的数据
-        \preg_match_all('/@([A-Za-z]\w+)\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches);
+        preg_match_all('/@([A-Za-z]\w+)\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches);
 
         /** @var array[] $matches */
         if ($matches) {
@@ -153,12 +164,12 @@ class DocBlockHelper
         $tagStrings = $matches = [];
 
         // 得到tag names
-        \preg_match_all('/@([A-Za-z]\w+)\(/', $docBlock, $matches);
+        preg_match_all('/@([A-Za-z]\w+)\(/', $docBlock, $matches);
 
         /** @var array[] $matches */
         if ($matches) {
             // 得到tag的内容
-            $contents = \preg_split('/@[A-Za-z]\w+\(/', $docBlock, -1, \PREG_SPLIT_NO_EMPTY);
+            $contents = preg_split('/@[A-Za-z]\w+\(/', $docBlock, -1, \PREG_SPLIT_NO_EMPTY);
             foreach ($matches[1] as $index => $name) {
                 // skip ignored
                 // if (isset(self::$ignoredTags[$name])) {
@@ -170,7 +181,7 @@ class DocBlockHelper
                 }
 
                 $rightBrackets = \strrpos($contents[$index], ')');
-                $tagStrings[] = [$name, \trim(\substr($contents[$index], 0, $rightBrackets), '')];
+                $tagStrings[] = [$name, trim(\substr($contents[$index], 0, $rightBrackets), '')];
             }
         }
 

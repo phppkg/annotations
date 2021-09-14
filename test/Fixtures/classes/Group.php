@@ -11,8 +11,9 @@
 class Group
 {
     /**
-     * @Attribute(first-name)
+     * @Attribute(first-name, some-text)
      * @Attribute(last-name)
+     * @SomeTag(one, two, three)
      * @Cache(max_time = 50)
      * @testAll(bool_var = false, int_var = 12345, float_var = 12345.6789, str_var = 'hello', str_woq=word,str_wq='hello word')
      * @testAll(name=erik, age=27, address={city="La paz", country="Bolivia", avenue='El Prado', building='Alameda', floor=15, dep_num=7}, phone=1234567890)

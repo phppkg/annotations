@@ -17,12 +17,13 @@
     }
   ],
   "require": {
-    "php": ">7.0.0",
+    "php": ">7.1.0",
+    "ext-mbstring": "*",
     "toolkit/stdlib": "~1.0"
   },
   "autoload": {
     "psr-4": {
-      "PhpcomLab\\Annotations\\": "src/"
+      "PhpComLab\\Annotations\\": "src/"
     }
   }
 }

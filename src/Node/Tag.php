@@ -6,11 +6,11 @@
  * Time: 11:59
  */
 
-namespace Ulue\Annotations\Node;
+namespace PhpComLab\Annotations\Node;
 
 /**
  * Class Tag
- * @package Ulue\Annotations\Node
+ * @package PhpComLab\Annotations\Node
  */
 class Tag
 {

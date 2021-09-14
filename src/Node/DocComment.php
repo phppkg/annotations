@@ -6,11 +6,11 @@
  * Time: 11:51
  */
 
-namespace Ulue\Annotations\Node;
+namespace PhpComLab\Annotations\Node;
 
 /**
  * Class DocCommentParser
- * @package Ulue\Annotations\Dode
+ * @package PhpComLab\Annotations\Dode
  */
 class DocComment
 {

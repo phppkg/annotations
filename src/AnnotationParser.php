@@ -6,13 +6,16 @@
  * Time: 下午8:24
  */
 
-namespace Ulue\Annotations;
+namespace PhpComLab\Annotations;
 
-use Ulue\Annotations\Full\TagContentParser;
+use InvalidArgumentException;
+use PhpComLab\Annotations\Full\TagContentParser;
+use function preg_match_all;
+use function vdump;
 
 /**
  * Class AnnotationParser
- * @package Ulue\Annotations
+ * @package PhpComLab\Annotations
  */
 final class AnnotationParser extends AbstractParser
 {
@@ -27,8 +30,10 @@ final class AnnotationParser extends AbstractParser
     {
         $tagStrings = $matches = [];
 
-        // bug： 当 tag 内部含有 右括号时，匹配出来会缺少后面的数据
-        \preg_match_all('/@([A-Za-z]\w+)\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches);
+        // bug：当 tag 内部含有 右括号时，匹配出来会缺少后面的数据
+        // m - 多行支持
+        preg_match_all('/@([A-Za-z]\w+)\(([^\)]*)\)[\s\t]*\r?/m', $docBlock, $matches);
+        // preg_match_all('/@([A-Za-z]\w+)\((.*)\)[\s\t]*\r?/m', $docBlock, $matches);
 
         /** @var array[] $matches */
         if ($matches) {
@@ -53,7 +58,7 @@ final class AnnotationParser extends AbstractParser
      * @param string $content
      * @param string $tag
      * @return array
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function parseTagContent(string $content, string $tag): array
     {

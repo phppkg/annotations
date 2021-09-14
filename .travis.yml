@@ -1,5 +1,0 @@
-language: php
-script: phpunit .
-
-php:
-  - 7.0

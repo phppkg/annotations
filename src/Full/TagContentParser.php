@@ -6,25 +6,32 @@
  * Time: 11:49
  */
 
-namespace Ulue\Annotations\Full;
+namespace PhpComLab\Annotations\Full;
 
-use Ulue\Annotations\DocBlockHelper;
+use InvalidArgumentException;
+use PhpComLab\Annotations\DocBlockHelper;
+use function in_array;
+use function is_array;
+use function mb_strlen;
+use function mb_substr;
+use function trim;
 
 /**
  * Class TagStringParser
- * @package Ulue\Annotations\Full
+ *
+ * @package PhpComLab\Annotations\Full
  */
 class TagContentParser
 {
-    const TOKENS = ['"', '"', '{', '}', ',', '='];
+    public const TOKENS = ['"', '"', '{', '}', ',', '='];
 
-    const SINGLE_QUOTES = "'";
-    const DOUBLE_QUOTES = '"';
+    public const SINGLE_QUOTES = "'";
+    public const DOUBLE_QUOTES = '"';
 
-    const COMMA = ',';
-    const EQUAL_SIGN = '=';
-    const CURLY_BRACES_L = '{';
-    const CURLY_BRACES_R = '}';
+    public const COMMA          = ',';
+    public const EQUAL_SIGN     = '=';
+    public const CURLY_BRACES_L = '{';
+    public const CURLY_BRACES_R = '}';
 
     /**
      * @var string
@@ -58,8 +65,9 @@ class TagContentParser
 
     /**
      * @param string $content
+     *
      * @return array
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function handle(string $content): array
     {
@@ -70,21 +78,22 @@ class TagContentParser
 
     /**
      * TagStringParser constructor.
+     *
      * @param string $content
      */
     public function __construct(string $content)
     {
-        $this->content = \trim($content);
-        $this->length = \mb_strlen($content, $this->encoding);
+        $this->content = trim($content);
+        $this->length  = mb_strlen($content, $this->encoding);
     }
 
-    const TYPE_TXT = 'plain'; // "some ..."
-    const TYPE_ARR = 'array'; // {v0,v1}
-    const TYPE_OBJ = 'object'; // {k=v}
+    public const TYPE_TXT = 'plain'; // "some ..."
+    public const TYPE_ARR = 'array'; // {v0,v1}
+    public const TYPE_OBJ = 'object'; // {k=v}
 
     /**
      * @return array
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function parse(): array
     {
@@ -92,15 +101,15 @@ class TagContentParser
             return [];
         }
 
-        $type = self::TYPE_TXT;
-        $level = 1;
-        $tokens = self::TOKENS;
+        $type      = self::TYPE_TXT;
+        $level     = 1;
+        $tokens    = self::TOKENS;
         $delimiter = null;
 
         $data = [];
-        $var = $val = '';
+        $var  = $val = '';
         // composing - 表明一个结构是否完善 ' -> ', " -> ", { -> }
-        $composing = $quoted = false;
+        $composing     = $quoted = false;
         $prevDelimiter = $nextDelimiter = '';
 
         $i = 0;
@@ -108,19 +117,20 @@ class TagContentParser
         while ($i < $len) {
             // $i++ processing ...
             $this->offset = $i;
-            $char = \mb_substr($this->content, $i++, 1, $this->encoding);
+
+            $char = mb_substr($this->content, $i++, 1, $this->encoding);
 
             if ($char === self::SINGLE_QUOTES || $char === self::DOUBLE_QUOTES) {
                 $delimiter = $char;
                 // open delimiter, init some vars
                 if (!$composing && !$prevDelimiter && !$nextDelimiter) {
                     $prevDelimiter = $nextDelimiter = $delimiter;
-                    $val = '';
-                    $composing = $quoted = true;
+                    $val           = '';
+                    $composing     = $quoted = true;
                 } else {
                     // close delimiter ' "
                     if ($char !== $nextDelimiter) {
-                        throw new \InvalidArgumentException(sprintf(
+                        throw new InvalidArgumentException(sprintf(
                             'Parse Error: enclosing error -> expected: [%s], given: [%s]',
                             $nextDelimiter, $char
                         ));
@@ -131,7 +141,7 @@ class TagContentParser
                         $nextChar = $this->getChar($i);
 
                         // 忽略 " 到 结构完结点 , 之间的 空格 换行 TAB 等无效字符
-                        if ('' === \trim($nextChar)) {
+                        if ('' === trim($nextChar)) {
                             $i++;
                         } elseif (self::COMMA !== $nextChar) {
                             // key 也用了 引号 {"id"="456"}
@@ -139,10 +149,10 @@ class TagContentParser
                                 break;
                             }
 
-                            throw new \InvalidArgumentException(sprintf(
+                            throw new InvalidArgumentException(sprintf(
                                 'Parse Error: missing comma separator near(next %s): ...%s<--',
                                 $nextChar,
-                                \mb_substr($this->content, $i - 12, $i, $this->encoding)
+                                mb_substr($this->content, $i - 12, $i, $this->encoding)
                             ));
                             // 是逗号 OK
                         } else {
@@ -151,15 +161,15 @@ class TagContentParser
                     }
 
                     $prevDelimiter = $nextDelimiter = '';
-                    $composing = false;
-                    $delimiter = null;
+                    $composing     = false;
+                    $delimiter     = null;
                 }
-            } elseif (!$composing && \in_array($char, $tokens, true)) {
+            } elseif (!$composing && in_array($char, $tokens, true)) {
                 switch ($char) {
                     case '=': // split key value
-                        $type = self::TYPE_ARR;
-                        $level = 2;
-                        $composing = $quoted = false;
+                        $type          = self::TYPE_ARR;
+                        $level         = 2;
+                        $composing     = $quoted = false;
                         $prevDelimiter = $nextDelimiter = '';
                         break;
                     case ',': // end a node.
@@ -168,7 +178,7 @@ class TagContentParser
                         // If composing flag is true yet,
                         // it means that the string was not enclosed, so it is parsing error.
                         if ($composing === true && $prevDelimiter && $nextDelimiter) {
-                            throw new \InvalidArgumentException(sprintf(
+                            throw new InvalidArgumentException(sprintf(
                                 'Parse Error: enclosing error -> expected: [%s], given: [%s]',
                                 $nextDelimiter, $char
                             ));
@@ -177,8 +187,8 @@ class TagContentParser
                         $prevDelimiter = $nextDelimiter = '';
                         break;
                     case '{': // start a sub content
-                        $type = self::TYPE_ARR;
-                        $subContent = $subDelimiter = '';
+                        $type         = self::TYPE_ARR;
+                        $subContent   = $subDelimiter = '';
                         $subComposing = true;
 
                         while ($i <= $len) {
@@ -186,7 +196,7 @@ class TagContentParser
                             $char = $this->getChar($i++);
 
                             if ($delimiter !== null && $char === $delimiter) {
-                                throw new \InvalidArgumentException(sprintf(
+                                throw new InvalidArgumentException(sprintf(
                                     'Parse Error: Composite variable is not enclosed correctly.'
                                 ));
                             }
@@ -207,7 +217,7 @@ class TagContentParser
 
                         // if the string is composing yet means that the structure of var. never was enclosed with '}'
                         if ($subComposing) {
-                            throw new \InvalidArgumentException(sprintf(
+                            throw new InvalidArgumentException(sprintf(
                                 "Parse Error: Composite variable is not enclosed correctly. near: ...%s'",
                                 $subContent
                             ));
@@ -220,16 +230,16 @@ class TagContentParser
             } else {
                 if ($level === 1) {
                     $var .= $char;
-                } elseif ($level === 2 && !\is_array($val)) {
+                } elseif ($level === 2 && !is_array($val)) {
                     $val .= $char;
                 }
             }
 
             // collect values
             if ($level === 3 || $i === $len) {
-                $var = \trim($var);
+                $var = trim($var);
 
-                if ($type === self::TYPE_TXT) {//  && $i === $len
+                if ($type === self::TYPE_TXT) { //  && $i === $len
                     $data[] = DocBlockHelper::castValue($var);
                 } elseif ($var === '') {
                     $data[] = DocBlockHelper::castValue($val, !$quoted);
@@ -238,9 +248,9 @@ class TagContentParser
                 }
 
                 // reset
-                $type = self::TYPE_TXT;
-                $level = 1;
-                $var = $val = '';
+                $type      = self::TYPE_TXT;
+                $level     = 1;
+                $var       = $val = '';
                 $composing = $quoted = false;
             }
 
@@ -260,6 +270,7 @@ class TagContentParser
 
     /**
      * @param int $offset
+     *
      * @return string
      */
     public function getChar(int $offset): string
@@ -268,7 +279,7 @@ class TagContentParser
             return '';
         }
 
-        return \mb_substr($this->content, $offset, 1, $this->encoding);
+        return mb_substr($this->content, $offset, 1, $this->encoding);
     }
 
     /**

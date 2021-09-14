@@ -1,7 +1,7 @@
 <?php
 namespace Base\Annotation;
 
-use Ulue\Annotations\AnnotationObject;
+use PhpComLab\Annotations\AnnotationObject;
 
 class RoleAnnotation extends AnnotationObject
 {

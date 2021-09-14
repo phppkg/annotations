@@ -66,13 +66,13 @@ Sample class User.php
     }
 ```
 
-Sample use.
+Sample use. 
 
 - get class annotations:
 
 ```php
 include 'User.php';
-$annotations = new Annotations();
+$annotations = new PhpComLab\Annotations\Annotations();
 $result = $annotations->getClassAnnotations('User');
 
 print_r($result);

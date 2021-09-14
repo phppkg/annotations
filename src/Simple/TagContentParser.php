@@ -6,11 +6,11 @@
  * Time: 14:33
  */
 
-namespace Ulue\Annotations\Simple;
+namespace PhpComLab\Annotations\Simple;
 
 /**
  * Class TagContentParser
- * @package Ulue\Annotations\Simple
+ * @package PhpComLab\Annotations\Simple
  */
 class TagContentParser
 {

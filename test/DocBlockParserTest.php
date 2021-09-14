@@ -6,19 +6,20 @@
  * Time: 23:40
  */
 
-namespace Ulue\Annotations\Test;
+namespace PhpComLab\Annotations\Test;
 
 use PHPUnit\Framework\TestCase;
-use Ulue\Annotations\DocBlockParser;
+use PhpComLab\Annotations\DocBlockParser;
+use function vdump;
 
 /**
  * Class DocBlockParserTest
- * @package Ulue\Annotations\Test
- * @covers \Ulue\Annotations\DocBlockParser
+ * @package PhpComLab\Annotations\Test
+ * @covers \PhpComLab\Annotations\DocBlockParser
  */
 class DocBlockParserTest extends TestCase
 {
-    public function testFilterAndParseDocComment1()
+    public function testFilterAndParseDocComment1(): void
     {
         $str = <<<DOC
 /**
@@ -40,7 +41,7 @@ class DocBlockParserTest extends TestCase
 DOC;
         DocBlockParser::notIgnoreTags(['example']);
         $tags = DocBlockParser::make()->parseToTagStrings($str);
-
+vdump($tags);
         $this->assertCount(2, $tags[1]);
         $this->assertCount(5, $tags);
 

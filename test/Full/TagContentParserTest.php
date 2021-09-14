@@ -6,14 +6,14 @@
  * Time: 14:59
  */
 
-namespace Ulue\Annotations\Test\Full;
+namespace PhpComLab\Annotations\Test\Full;
 
 use PHPUnit\Framework\TestCase;
-use Ulue\Annotations\Full\TagContentParser;
+use PhpComLab\Annotations\Full\TagContentParser;
 
 /**
  * Class TagContentParserTest
- * @package Ulue\Annotations\Test\Full
+ * @package PhpComLab\Annotations\Test\Full
  */
 class TagContentParserTest extends TestCase
 {
@@ -157,7 +157,7 @@ class TagContentParserTest extends TestCase
         ];
     }
 
-    public function testAdvancedParse()
+    public function testAdvancedParse(): void
     {
         $data = TagContentParser::handle('val, val1, val2, val3');
         $this->assertCount(4, $data);

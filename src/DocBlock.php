@@ -6,11 +6,11 @@
  * Time: 23:27
  */
 
-namespace Ulue\Annotations;
+namespace PhpComLab\Annotations;
 
 /**
  * Class DocBlock
- * @package Ulue\Annotations
+ * @package PhpComLab\Annotations
  */
 class DocBlock
 {
