@@ -244,17 +244,9 @@ Array
 phpunit
 ```
 
-## 问题
+## Related
 
-- tag 内容里含有 括号时，解析有问题
-
-```php
-/**
- * @Route(path="{alias}", method="GET", params={"alias"="[a-zA-Z][\\w-]+(?:.html)?"})
- */
- 
- // 取不到 )?"})
-```
+- https://github.com/marcioAlmada/annotations
 
 ## LICENSE
 
