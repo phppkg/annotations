@@ -29,8 +29,8 @@ class DocBlockParserTest extends TestCase
  *  name       The class name, don't need suffix and ext.(eg. <info>demo</info>)
  *  dir        The class file save dir(default: <info>@app/Console/Command</info>)
  * @options
- *  --output STRING    Setting the routes file(app/routes.php)
- *  -y, --yes BOOL     Whether display goon tips message.
+ *  --output       Setting the routes file(app/routes.php)
+ *  -y, --yes      Whether display goon tips message.
  * @example
  *  <info>{fullCommand} demo</info>        Gen DemoCommand class to `@app/Console/Command`
  * @param  \Inhere\Console\IO\Input \$in
