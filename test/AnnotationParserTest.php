@@ -6,16 +6,16 @@
  * Time: 11:23
  */
 
-namespace PhpComLab\Annotations\Test;
+namespace PhpPkg\Annotations\Test;
 
 use PHPUnit\Framework\TestCase;
-use PhpComLab\Annotations\AnnotationParser;
+use PhpPkg\Annotations\AnnotationParser;
 use function vdump;
 
 /**
  * Class AnnotationParserTest
- * @package PhpComLab\Annotations\Test
- * @covers \PhpComLab\Annotations\AnnotationParser
+ * @package PhpPkg\Annotations\Test
+ * @covers \PhpPkg\Annotations\AnnotationParser
  */
 class AnnotationParserTest extends TestCase
 {

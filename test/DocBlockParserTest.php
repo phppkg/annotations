@@ -6,16 +6,16 @@
  * Time: 23:40
  */
 
-namespace PhpComLab\Annotations\Test;
+namespace PhpPkg\Annotations\Test;
 
 use PHPUnit\Framework\TestCase;
-use PhpComLab\Annotations\DocBlockParser;
+use PhpPkg\Annotations\DocBlockParser;
 use function vdump;
 
 /**
  * Class DocBlockParserTest
- * @package PhpComLab\Annotations\Test
- * @covers \PhpComLab\Annotations\DocBlockParser
+ * @package PhpPkg\Annotations\Test
+ * @covers \PhpPkg\Annotations\DocBlockParser
  */
 class DocBlockParserTest extends TestCase
 {

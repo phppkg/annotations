@@ -6,7 +6,7 @@
  * Time: 12:16
  */
 
-namespace PhpComLab\Annotations;
+namespace PhpPkg\Annotations;
 
 use function preg_match;
 use function preg_replace;
@@ -17,7 +17,7 @@ use function trim;
 /**
  * Class DocBlockParser
  *
- * @package PhpComLab\Annotations
+ * @package PhpPkg\Annotations
  */
 class DocBlockParser extends AbstractParser
 {

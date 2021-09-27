@@ -9,15 +9,15 @@ date_default_timezone_set('Asia/Shanghai');
 spl_autoload_register(function ($class) {
     $file = null;
 
-    if (0 === strpos($class, 'PhpComLab\Annotations\Examples\\')) {
-        $path = str_replace('\\', '/', substr($class, strlen('PhpComLab\Annotations\Examples\\')));
+    if (0 === strpos($class, 'PhpPkg\Annotations\Examples\\')) {
+        $path = str_replace('\\', '/', substr($class, strlen('PhpPkg\Annotations\Examples\\')));
         $file = dirname(__DIR__) . "/examples/$path.php";
 
-    } elseif (0 === strpos($class, 'PhpComLab\Annotations\Test\\')) {
-        $path = str_replace('\\', '/', substr($class, strlen('PhpComLab\Annotations\Test\\')));
+    } elseif (0 === strpos($class, 'PhpPkg\Annotations\Test\\')) {
+        $path = str_replace('\\', '/', substr($class, strlen('PhpPkg\Annotations\Test\\')));
         $file = __DIR__ . "/$path.php";
-    } elseif (0 === strpos($class, 'PhpComLab\Annotations\\')) {
-        $path = str_replace('\\', '/', substr($class, strlen('PhpComLab\Annotations\\')));
+    } elseif (0 === strpos($class, 'PhpPkg\Annotations\\')) {
+        $path = str_replace('\\', '/', substr($class, strlen('PhpPkg\Annotations\\')));
         $file = dirname(__DIR__) . "/src/$path.php";
     }
 

@@ -6,11 +6,11 @@
  * Time: 16:46
  */
 
-namespace PhpComLab\Annotations;
+namespace PhpPkg\Annotations;
 
 /**
  * Class AnnotationObject
- * @package PhpComLab\Annotations
+ * @package PhpPkg\Annotations
  */
 class AnnotationObject
 {

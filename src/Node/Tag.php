@@ -6,11 +6,11 @@
  * Time: 11:59
  */
 
-namespace PhpComLab\Annotations\Node;
+namespace PhpPkg\Annotations\Node;
 
 /**
  * Class Tag
- * @package PhpComLab\Annotations\Node
+ * @package PhpPkg\Annotations\Node
  */
 class Tag
 {

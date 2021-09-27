@@ -6,11 +6,11 @@
  * Time: 23:27
  */
 
-namespace PhpComLab\Annotations;
+namespace PhpPkg\Annotations;
 
 /**
  * Class DocBlock
- * @package PhpComLab\Annotations
+ * @package PhpPkg\Annotations
  */
 class DocBlock
 {

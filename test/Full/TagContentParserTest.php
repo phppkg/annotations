@@ -6,14 +6,14 @@
  * Time: 14:59
  */
 
-namespace PhpComLab\Annotations\Test\Full;
+namespace PhpPkg\Annotations\Test\Full;
 
 use PHPUnit\Framework\TestCase;
-use PhpComLab\Annotations\Full\TagContentParser;
+use PhpPkg\Annotations\Full\TagContentParser;
 
 /**
  * Class TagContentParserTest
- * @package PhpComLab\Annotations\Test\Full
+ * @package PhpPkg\Annotations\Test\Full
  */
 class TagContentParserTest extends TestCase
 {

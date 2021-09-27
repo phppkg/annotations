@@ -6,7 +6,7 @@
  * Time: 18:43
  */
 
-use PhpComLab\Annotations\Annotations;
+use PhpPkg\Annotations\Annotations;
 
 require dirname(__DIR__) . '/test/boot.php';
 

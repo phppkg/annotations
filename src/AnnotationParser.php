@@ -6,16 +6,16 @@
  * Time: 下午8:24
  */
 
-namespace PhpComLab\Annotations;
+namespace PhpPkg\Annotations;
 
 use InvalidArgumentException;
-use PhpComLab\Annotations\Full\TagContentParser;
+use PhpPkg\Annotations\Full\TagContentParser;
 use function preg_match_all;
 use function vdump;
 
 /**
  * Class AnnotationParser
- * @package PhpComLab\Annotations
+ * @package PhpPkg\Annotations
  */
 final class AnnotationParser extends AbstractParser
 {

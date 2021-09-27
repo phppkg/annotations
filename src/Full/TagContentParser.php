@@ -6,10 +6,10 @@
  * Time: 11:49
  */
 
-namespace PhpComLab\Annotations\Full;
+namespace PhpPkg\Annotations\Full;
 
 use InvalidArgumentException;
-use PhpComLab\Annotations\DocBlockHelper;
+use PhpPkg\Annotations\DocBlockHelper;
 use function in_array;
 use function is_array;
 use function mb_strlen;
@@ -19,7 +19,7 @@ use function trim;
 /**
  * Class TagStringParser
  *
- * @package PhpComLab\Annotations\Full
+ * @package PhpPkg\Annotations\Full
  */
 class TagContentParser
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace PhpComLab\Annotations\Test;
+namespace PhpPkg\Annotations\Test;
 
 use InvalidArgumentException;
-use PhpComLab\Annotations\AnnotationParser;
-use PhpComLab\Annotations\Annotations;
+use PhpPkg\Annotations\AnnotationParser;
+use PhpPkg\Annotations\Annotations;
 use PHPUnit\Framework\TestCase;
 use function vdump;
 
@@ -36,7 +36,7 @@ class Annotations2Test extends TestCase
     }
 
     /**
-     * @covers \PhpComLab\Annotations\Annotations::getClassAnnotations
+     * @covers \PhpPkg\Annotations\Annotations::getClassAnnotations
      * @throws \ReflectionException
      */
     public function testGetClassAnnotations(): void
@@ -70,7 +70,7 @@ class Annotations2Test extends TestCase
     }
 
     /**
-     * @covers \PhpComLab\Annotations\Annotations::getMethodAnnotations
+     * @covers \PhpPkg\Annotations\Annotations::getMethodAnnotations
      */
     public function testGetMethodAnnotations_complex(): void
     {

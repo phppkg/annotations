@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpComLab\Annotations\Test;
+namespace PhpPkg\Annotations\Test;
 
 use PHPUnit\Framework\TestCase;
-use PhpComLab\Annotations\Annotations;
+use PhpPkg\Annotations\Annotations;
 use Base\Annotation\PermissionAnnotation;
 use Base\Annotation\RoleAnnotation;
 

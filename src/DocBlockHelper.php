@@ -6,7 +6,7 @@
  * Time: 11:59
  */
 
-namespace PhpComLab\Annotations;
+namespace PhpPkg\Annotations;
 
 use function is_array;
 use function is_numeric;
@@ -21,7 +21,7 @@ use function trim;
 /**
  * Class DocBlockHelper
  *
- * @package PhpComLab\Annotations
+ * @package PhpPkg\Annotations
  */
 class DocBlockHelper
 {

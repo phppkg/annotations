@@ -21,6 +21,6 @@ $docBlock = <<<DOC
 DOC;
 
 $nameAsKey = true;
-$ret = \PhpComLab\Annotations\AnnotationParser::make()->parse($docBlock, $nameAsKey);
+$ret = \PhpPkg\Annotations\AnnotationParser::make()->parse($docBlock, $nameAsKey);
 var_dump($ret);
 

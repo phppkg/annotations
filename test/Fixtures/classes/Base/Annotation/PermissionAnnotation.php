@@ -1,7 +1,7 @@
 <?php
 namespace Base\Annotation;
 
-use PhpComLab\Annotations\AnnotationObject;
+use PhpPkg\Annotations\AnnotationObject;
 
 class PermissionAnnotation extends AnnotationObject
 {

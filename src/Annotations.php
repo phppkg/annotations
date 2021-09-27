@@ -6,7 +6,7 @@
  * Time: 16:46
  */
 
-namespace PhpComLab\Annotations;
+namespace PhpPkg\Annotations;
 
 use InvalidArgumentException;
 use ReflectionClass;

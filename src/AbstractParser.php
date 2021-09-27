@@ -6,7 +6,7 @@
  * Time: 14:44
  */
 
-namespace PhpComLab\Annotations;
+namespace PhpPkg\Annotations;
 
 use InvalidArgumentException;
 use function preg_replace;
@@ -17,7 +17,7 @@ use function vdump;
 /**
  * Class AbstractParser
  *
- * @package PhpComLab\Annotations
+ * @package PhpPkg\Annotations
  */
 abstract class AbstractParser
 {

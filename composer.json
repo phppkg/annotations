@@ -1,9 +1,12 @@
 {
-  "name": "phpcom-lab/annotations",
+  "name": "phppkg/annotations",
   "type": "library",
   "description": "Simple and Lightweight PHP Class & Methods Annotations Reader",
-  "keywords": [],
-  "homepage": "https://github.com/phpcom-lab/annotations",
+  "keywords": [
+    "doc-comments",
+    "annotations"
+  ],
+  "homepage": "https://github.com/phppkg/annotations",
   "license": "MIT",
   "authors": [
     {
@@ -23,7 +26,7 @@
   },
   "autoload": {
     "psr-4": {
-      "PhpComLab\\Annotations\\": "src/"
+      "PhpPkg\\Annotations\\": "src/"
     }
   }
 }

@@ -6,11 +6,11 @@
  * Time: 14:33
  */
 
-namespace PhpComLab\Annotations\Simple;
+namespace PhpPkg\Annotations\Simple;
 
 /**
  * Class TagContentParser
- * @package PhpComLab\Annotations\Simple
+ * @package PhpPkg\Annotations\Simple
  */
 class TagContentParser
 {

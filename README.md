@@ -6,14 +6,14 @@ Simple and Lightweight PHP Class & Methods Annotations Reader
 
 ## 项目地址
 
-- **github** https://github.com/phpcom-lab/annotations.git
+- **github** https://github.com/phppkg/annotations.git
 
 ## 安装
 
 - composer 命令
 
 ```php
-composer require phpcom-lab/annotations
+composer require phppkg/annotations
 ```
 
 - composer.json
@@ -21,7 +21,7 @@ composer require phpcom-lab/annotations
 ```json
 {
     "require": {
-        "phpcom-lab/annotations": "dev-master"
+        "phppkg/annotations": "dev-master"
     }
 }
 ```
@@ -29,7 +29,7 @@ composer require phpcom-lab/annotations
 - 直接拉取
 
 ```bash
-git clone https://github.com/phpcom-lab/annotations.git // github
+git clone https://github.com/phppkg/annotations.git // github
 ```
 
 ## 使用
@@ -72,7 +72,7 @@ Sample use.
 
 ```php
 include 'User.php';
-$annotations = new PhpComLab\Annotations\Annotations();
+$annotations = new PhpPkg\Annotations\Annotations();
 $result = $annotations->getClassAnnotations('User');
 
 print_r($result);
