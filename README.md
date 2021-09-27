@@ -1,5 +1,9 @@
 # README
 
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/phppkg/annotations)](https://github.com/phppkg/annotations)
+[![Github Actions Status](https://github.com/phppkg/annotations/workflows/Unit-tests/badge.svg)](https://github.com/phppkg/annotations/actions)
+[![Php Version](https://img.shields.io/badge/php-%3E7.1.0-brightgreen.svg?maxAge=2592000)](https://packagist.org/packages/phppkg/annotations)
+
 Simple and Lightweight PHP Class & Methods Annotations Reader
 
 > Forked from [eriknyk/Annotations](https://github.com/eriknyk/Annotations)
